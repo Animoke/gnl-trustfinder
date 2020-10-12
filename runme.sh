@@ -5,7 +5,8 @@ function cleanup()
 	rm -f diff.txt
 }
 trap cleanup EXIT
-src_path="../gnl"
+src_path="../gnl" #Change directory here
+
 buffer_size=1
 echo -n "" > DEEPTHOUGHT
 
