@@ -16,7 +16,7 @@ function exit_err()
 	exit 1
 }
 
-src_path="../gnl-github" #Change directory here
+src_path="../gnl" #Change directory here
 
 trap cleanup EXIT
 mkdir obj src diff mains
@@ -108,6 +108,32 @@ int		main(int ac, char **av)
 	return (0);
 }" > mains/main.c
 
+echo "#include \"../src/get_next_line.h\"
+
+int		main(int ac, char **av)
+{
+	(void)ac;
+	char *line;
+	int fd1 = open(argv[1], O_RDONLY);
+	int fd2 = open(argv[2], O_RDONLY);
+	int d = 1;
+	while (d)
+	{
+		if (d &= (get_next_line(fd1, &line) > 0))
+		{
+			printf(\"%s\n\", line);
+			free(line);
+		}
+		if (d &= (get_next_line(fd2, &line) > 0))
+		{
+			printf(\"%s\n\", line);
+			free(line);
+		}
+	}
+	free(line);
+	return (0);
+}" > mains/main_bonus.c
+
 # Colors
 NOCOLOR='\033[0m'
 RED='\033[0;31m'
@@ -136,7 +162,8 @@ uni_sep="❯"
 diff_ok="${GREEN}[OK]${NOCOLOR}"
 diff_ko="${RED}[KO]${NOCOLOR}"
 
-#Copying sources
+# Copying sources
+
 #if [ getopts b: flag == false ] ; then
 	echo -e "${YELLOW}----------------Copying----------------${NOCOLOR}"
 	cp $src_path/get_next_line.c src/get_next_line.c && echo "$uni_arrow cp $src_path/get_next_line.c src/get_next_line.c"
@@ -154,7 +181,7 @@ diff_ko="${RED}[KO]${NOCOLOR}"
 	echo ""
 #fi
 
-#Compiling from sources (no bonus)
+# Compiling from sources (no bonus)
 echo -e "${YELLOW}---------------Compiling---------------${NOCOLOR}"
 while [ $buffer_size -le 8 ]
 do
@@ -171,7 +198,8 @@ done
 
 echo ""
 
-#Comparing output and input file with diff/*
+# Comparing output and input file with diff/*
+diff_output=true
 echo -e "${YELLOW}-----------Comparing outputs-----------${NOCOLOR}"
 echo ""
 echo "$uni_arrow Comparing with diff/empty"
@@ -182,8 +210,10 @@ do
 		diff -y diff/empty diff.txt
 		echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
 		echo "$uni_fail error: output differs from diff/empty"
+		(($diff_output=true))
 	else
 		echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
+		(($diff_output=false))
 	fi
 	echo -ne "$NOCOLOR"
 	((counter++))
@@ -198,8 +228,10 @@ do
 		diff -y diff/rly_small diff.txt
 		echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
 		echo "$uni_fail error: output differs from diff/empty"
+		(($diff_output=true))
 	else
 		echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
+		(($diff_output=false))
 	fi
 	((counter++))
 	echo -ne "$NOCOLOR"
@@ -214,8 +246,10 @@ do
 		diff -y diff/small diff.txt
 		echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
 		echo "$uni_fail error: output differs from diff/empty"
+		(($diff_output=true))
 	else
 		echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
+		(($diff_output=false))
 	fi
 	((counter++))
 	echo -ne "$NOCOLOR"
@@ -230,8 +264,10 @@ do
 		diff -y diff/med diff.txt
 		echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
 		echo "$uni_fail error: output differs from diff/empty"
+		(($diff_output=true))
 	else
 		echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
+		(($diff_output=false))
 	fi
 	((counter++))
 	echo -ne "$NOCOLOR"
@@ -246,15 +282,23 @@ do
 		diff -y diff/big diff.txt
 		echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
 		echo "$uni_fail error: output differs from diff/empty"
+		(($diff_output=true))
 	else
 		echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
+		(($diff_output=false))
 	fi
 	((counter++))
 	echo -ne "$NOCOLOR"
 done
-echo -e "\nAll good!\n"
+echo ""
+if [ $diff_output ] ; then
+	echo -e "${GREEN}All good!${NOCOLOR}"
+else
+	echo -e "${RED}One or more tests failed. Check DEEPTHOUGHT for logs${NOCOLOR}"
+fi
+echo ""
 
-#Compiling with -fsanitize-address to test for leaks
+# Compiling with -fsanitize-address to test for leaks
 leaks_tests=true
 echo -e "${YELLOW}-------------Testing leaks-------------${NOCOLOR}"
 echo "$uni_arrow Compiling with BUFFER_SIZE=1"
