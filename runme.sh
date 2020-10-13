@@ -108,46 +108,71 @@ int		main(int ac, char **av)
 	return (0);
 }" > mains/main.c
 
+# Colors
+NOCOLOR='\033[0m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+ORANGE='\033[0;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+LIGHTGRAY='\033[0;37m'
+DARKGRAY='\033[1;30m'
+LIGHTRED='\033[1;31m'
+LIGHTGREEN='\033[1;32m'
+YELLOW='\033[1;33m'
+LIGHTBLUE='\033[1;34m'
+LIGHTPURPLE='\033[1;35m'
+LIGHTCYAN='\033[1;36m'
+WHITE='\033[1;37m'
+
+# Variables
 buffer_size=1
 counter=1
 uni_success="✅"
 uni_fail="❌"
 uni_arrow="➥"
+uni_sep="❯"
+diff_ok="${GREEN}[OK]${NOCOLOR}"
+diff_ko="${RED}[KO]${NOCOLOR}"
 
 #Copying sources
-echo "----------------Copying----------------"
-cp $src_path/get_next_line.c src/get_next_line.c && echo "$uni_arrow cp $src_path/get_next_line.c src/get_next_line.c"
-cp $src_path/get_next_line_utils.c src/get_next_line_utils.c && echo "$uni_arrow cp $src_path/get_next_line_utils.c src/get_next_line_utils.c"
-cp $src_path/get_next_line.h src/get_next_line.h && echo "$uni_arrow cp $src_path/get_next_line.h src/get_next_line.h"
-echo ""
-if ! ls src/get_next_line.c || ! ls src/get_next_line.h || ! ls src/get_next_line_utils.c ; then
-	echo "$uni_fail error: files could not be copied"
-	exit_err
-fi
+#if [ getopts b: flag == false ] ; then
+	echo -e "${YELLOW}----------------Copying----------------${NOCOLOR}"
+	cp $src_path/get_next_line.c src/get_next_line.c && echo "$uni_arrow cp $src_path/get_next_line.c src/get_next_line.c"
+	cp $src_path/get_next_line_utils.c src/get_next_line_utils.c && echo "$uni_arrow cp $src_path/get_next_line_utils.c src/get_next_line_utils.c"
+	cp $src_path/get_next_line.h src/get_next_line.h && echo "$uni_arrow cp $src_path/get_next_line.h src/get_next_line.h"
+	echo ""
+	if ! ls src/get_next_line.c || ! ls src/get_next_line.h || ! ls src/get_next_line_utils.c ; then
+		echo "$uni_fail error: files could not be copied"
+		exit_err
+	fi
 
-echo ""
-echo -n "$uni_arrow    " && ls -l src/
-echo "$uni_sucess Files successfully copied into src/"
-echo ""
+	echo ""
+	echo -n "$uni_arrow    " && ls -l src/
+	echo "$uni_sucess Files successfully copied into src/"
+	echo ""
+#fi
 
 #Compiling from sources (no bonus)
-echo "---------------Compiling---------------"
+echo -e "${YELLOW}---------------Compiling---------------${NOCOLOR}"
 while [ $buffer_size -le 8 ]
 do
-	echo -n "$uni_arrow"
+	echo -ne "$uni_arrow  ${LIGHTBLUE}"
 	gcc -Wall -Werror -Wextra -D BUFFER_SIZE=$buffer_size src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/$buffer_size.out
 	if ! ls obj/$buffer_size.out ; then
-		echo "$uni_fail $buffer_size | error: compilation failed. View DEEPTOUGHT for more info"
+		echo -e "${NOCOLOR} $uni_fail $buffer_size ${uni_cep}${RED} error: compilation failed. View DEEPTOUGHT for more info"
 	else
-		echo "$uni_success $buffer_size | Compilation successful"
+		echo -e "${NOCOLOR} $uni_success $buffer_size ${uni_sep}${GREEN} Compilation successful"
 	fi
+	echo -ne "${NOCOLOR}"
 	((buffer_size++))
 done
 
 echo ""
 
 #Comparing output and input file with diff/*
-echo "-----------Comparing outputs-----------"
+echo -e "${YELLOW}-----------Comparing outputs-----------${NOCOLOR}"
 echo ""
 echo "$uni_arrow Comparing with diff/empty"
 while [ $counter -le 8 ]
@@ -155,11 +180,12 @@ do
 	./obj/$counter.out diff/empty > diff.txt
 	if ! diff -q diff/empty diff.txt ; then
 		diff -y diff/empty diff.txt
-		echo "$uni_fail BUFFER_SIZE=$counter [KO]"
+		echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
 		echo "$uni_fail error: output differs from diff/empty"
 	else
-		echo "$uni_success BUFFER_SIZE=$counter [OK]"
+		echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
 	fi
+	echo -ne "$NOCOLOR"
 	((counter++))
 done
 counter=1
@@ -170,12 +196,13 @@ do
 	./obj/$counter.out diff/rly_small > diff.txt
 	if ! diff -q diff/rly_small diff.txt ; then
 		diff -y diff/rly_small diff.txt
-		echo "$uni_fail BUFFER_SIZE=$counter [KO]"
+		echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
 		echo "$uni_fail error: output differs from diff/empty"
 	else
-		echo "$uni_success BUFFER_SIZE=$counter [OK]"
+		echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
 	fi
 	((counter++))
+	echo -ne "$NOCOLOR"
 done
 counter=1
 echo ""
@@ -185,12 +212,13 @@ do
 	./obj/$counter.out diff/small > diff.txt
 	if ! diff -q diff/small diff.txt ; then
 		diff -y diff/small diff.txt
-		echo "$uni_fail BUFFER_SIZE=$counter [KO]"
+		echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
 		echo "$uni_fail error: output differs from diff/empty"
 	else
-		echo "$uni_success BUFFER_SIZE=$counter [OK]"
+		echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
 	fi
 	((counter++))
+	echo -ne "$NOCOLOR"
 done
 counter=1
 echo ""
@@ -200,12 +228,13 @@ do
 	./obj/$counter.out diff/med > diff.txt
 	if ! diff -q diff/med diff.txt ; then
 		diff -y diff/med diff.txt
-		echo "$uni_fail BUFFER_SIZE=$counter [KO]"
+		echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
 		echo "$uni_fail error: output differs from diff/empty"
 	else
-		echo "$uni_success BUFFER_SIZE=$counter [OK]"
+		echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
 	fi
 	((counter++))
+	echo -ne "$NOCOLOR"
 done
 counter=1
 echo ""
@@ -215,24 +244,25 @@ do
 	./obj/$counter.out diff/big > diff.txt
 	if ! diff -q diff/big diff.txt ; then
 		diff -y diff/big diff.txt
-		echo "$uni_fail BUFFER_SIZE=$counter [KO]"
+		echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
 		echo "$uni_fail error: output differs from diff/empty"
 	else
-		echo "$uni_success BUFFER_SIZE=$counter [OK]"
+		echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
 	fi
 	((counter++))
+	echo -ne "$NOCOLOR"
 done
 echo -e "\nAll good!\n"
 
 #Compiling with -fsanitize-address to test for leaks
 leaks_tests=true
-echo "-------------Testing leaks-------------"
+echo -e "${YELLOW}-------------Testing leaks-------------${NOCOLOR}"
 echo "$uni_arrow Compiling with BUFFER_SIZE=1"
 gcc -Wall -Werror -Wextra -g -fsanitize=address -D BUFFER_SIZE=1 src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/1_leaks_test.out
 echo "$uni_arrow Compiling with BUFFER_SIZE=512"
 gcc -Wall -Werror -Wextra -g -fsanitize=address -D BUFFER_SIZE=512 src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/512_leaks_test.out
 if ! ls obj/1_leaks_test.out || ! ls obj/512_leaks_test.out ; then
-	echo "$uni_fail Compiling failed. Skipping leaks tests..."
+	echo -e "$uni_fail ${RED}Compiling failed. Skipping leaks tests..."
 	leaks_tests=false
 fi
 
@@ -242,9 +272,9 @@ if [ $leaks_tests == true ] ; then
 	if ! ./obj/1_leaks_test.out diff/small > /dev/null || ! ./obj/512_leaks_test.out diff/small > /dev/null ; then
 		echo "================================================================="
 		echo
-		echo "$uni_fail Your get_next_line leaks! [KO]"
+		echo -e "$uni_fail Your get_next_line leaks! $diff_ko"
 	else
 		echo
-		echo -e "$uni_success Your get_next_line does not leak! [OK]"
+		echo -e "$uni_success Your get_next_line does not leak! $diff_ok"
 	fi
 fi
