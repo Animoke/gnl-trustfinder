@@ -110,7 +110,7 @@ buffer_size=1
 counter=1
 
 #Copying sources
-echo "----------Copying----------"
+echo "----------------Copying----------------"
 cp $src_path/get_next_line.c src/get_next_line.c && echo "➥ cp $src_path/get_next_line.c src/get_next_line.c"
 cp $src_path/get_next_line_utils.c src/get_next_line_utils.c && echo "➥ cp $src_path/get_next_line_utils.c src/get_next_line_utils.c"
 cp $src_path/get_next_line.h src/get_next_line.h && echo "➥ cp $src_path/get_next_line.h src/get_next_line.h"
@@ -126,7 +126,7 @@ echo "✅Files successfully copied into src/"
 echo ""
 
 #Compiling from sources (no bonus)
-echo "---------Compiling---------"
+echo "---------------Compiling---------------"
 while [ $buffer_size -le 8 ]
 do
 	echo -n "➥ "
@@ -142,7 +142,7 @@ done
 echo ""
 
 #Comparing output and input file with diff/*
-echo "-----Comparing outputs-----"
+echo "-----------Comparing outputs-----------"
 echo ""
 echo "➥ Comparing with diff/empty"
 while [ $counter -le 8 ]
@@ -221,7 +221,7 @@ echo -e "\nAll good!\n"
 
 #Compiling with -fsanitize-address to test for leaks
 leaks_tests=true
-echo "-------Testing leaks-------"
+echo "-------------Testing leaks-------------"
 echo "➥ Compiling with BUFFER_SIZE=1"
 gcc -Wall -Werror -Wextra -g -fsanitize=address -D BUFFER_SIZE=1 src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/1_leaks_test.out
 echo "➥ Compiling with BUFFER_SIZE=512"
