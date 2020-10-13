@@ -16,9 +16,12 @@ function exit_err()
 	exit 1
 }
 
+src_path="../gnl-github" #Change directory here
+
 trap cleanup EXIT
 mkdir obj src diff mains
 
+#Making files so the tester only has one file to download
 echo -n "" > DEEPTHOUGHT
 echo -n "" > diff/empty
 echo -e "\n" > diff/rly_small
@@ -105,36 +108,38 @@ int		main(int ac, char **av)
 	return (0);
 }" > mains/main.c
 
-src_path="../gnl" #Change directory here
 buffer_size=1
 counter=1
+uni_success="✅"
+uni_fail="❌"
+uni_arrow="➥"
 
 #Copying sources
 echo "----------------Copying----------------"
-cp $src_path/get_next_line.c src/get_next_line.c && echo "➥ cp $src_path/get_next_line.c src/get_next_line.c"
-cp $src_path/get_next_line_utils.c src/get_next_line_utils.c && echo "➥ cp $src_path/get_next_line_utils.c src/get_next_line_utils.c"
-cp $src_path/get_next_line.h src/get_next_line.h && echo "➥ cp $src_path/get_next_line.h src/get_next_line.h"
+cp $src_path/get_next_line.c src/get_next_line.c && echo "$uni_arrow cp $src_path/get_next_line.c src/get_next_line.c"
+cp $src_path/get_next_line_utils.c src/get_next_line_utils.c && echo "$uni_arrow cp $src_path/get_next_line_utils.c src/get_next_line_utils.c"
+cp $src_path/get_next_line.h src/get_next_line.h && echo "$uni_arrow cp $src_path/get_next_line.h src/get_next_line.h"
 echo ""
 if ! ls src/get_next_line.c || ! ls src/get_next_line.h || ! ls src/get_next_line_utils.c ; then
-	echo "❌error: files could not be copied"
+	echo "$uni_fail error: files could not be copied"
 	exit_err
 fi
 
 echo ""
-echo -n "➥ " && ls -l src/
-echo "✅Files successfully copied into src/"
+echo -n "$uni_arrow    " && ls -l src/
+echo "$uni_sucess Files successfully copied into src/"
 echo ""
 
 #Compiling from sources (no bonus)
 echo "---------------Compiling---------------"
 while [ $buffer_size -le 8 ]
 do
-	echo -n "➥ "
+	echo -n "$uni_arrow"
 	gcc -Wall -Werror -Wextra -D BUFFER_SIZE=$buffer_size src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/$buffer_size.out
 	if ! ls obj/$buffer_size.out ; then
-		echo "❌$buffer_size | error: compilation failed. View DEEPTOUGHT for more info"
+		echo "$uni_fail $buffer_size | error: compilation failed. View DEEPTOUGHT for more info"
 	else
-		echo "✅$buffer_size | Compilation successful"
+		echo "$uni_success $buffer_size | Compilation successful"
 	fi
 	((buffer_size++))
 done
@@ -144,76 +149,76 @@ echo ""
 #Comparing output and input file with diff/*
 echo "-----------Comparing outputs-----------"
 echo ""
-echo "➥ Comparing with diff/empty"
+echo "$uni_arrow Comparing with diff/empty"
 while [ $counter -le 8 ]
 do
 	./obj/$counter.out diff/empty > diff.txt
 	if ! diff -q diff/empty diff.txt ; then
 		diff -y diff/empty diff.txt
-		echo "❌BUFFER_SIZE=$counter [KO]"
-		echo "❌error: output differs from diff/empty"
+		echo "$uni_fail BUFFER_SIZE=$counter [KO]"
+		echo "$uni_fail error: output differs from diff/empty"
 	else
-		echo "✅BUFFER_SIZE=$counter [OK]"
+		echo "$uni_success BUFFER_SIZE=$counter [OK]"
 	fi
 	((counter++))
 done
 counter=1
 echo ""
-echo "➥ Comparing with diff/rly_small"
+echo "$uni_arrow Comparing with diff/rly_small"
 while [ $counter -le 8 ]
 do
 	./obj/$counter.out diff/rly_small > diff.txt
 	if ! diff -q diff/rly_small diff.txt ; then
 		diff -y diff/rly_small diff.txt
-		echo "❌BUFFER_SIZE=$counter [KO]"
-		echo "❌error: output differs from diff/empty"
+		echo "$uni_fail BUFFER_SIZE=$counter [KO]"
+		echo "$uni_fail error: output differs from diff/empty"
 	else
-		echo "✅BUFFER_SIZE=$counter [OK]"
+		echo "$uni_success BUFFER_SIZE=$counter [OK]"
 	fi
 	((counter++))
 done
 counter=1
 echo ""
-echo "➥ Comparing with diff/small"
+echo "$uni_arrow Comparing with diff/small"
 while [ $counter -le 8 ]
 do
 	./obj/$counter.out diff/small > diff.txt
 	if ! diff -q diff/small diff.txt ; then
 		diff -y diff/small diff.txt
-		echo "❌BUFFER_SIZE=$counter [KO]"
-		echo "❌error: output differs from diff/empty"
+		echo "$uni_fail BUFFER_SIZE=$counter [KO]"
+		echo "$uni_fail error: output differs from diff/empty"
 	else
-		echo "✅BUFFER_SIZE=$counter [OK]"
+		echo "$uni_success BUFFER_SIZE=$counter [OK]"
 	fi
 	((counter++))
 done
 counter=1
 echo ""
-echo "➥ Comparing with diff/med"
+echo "$uni_arrow Comparing with diff/med"
 while [ $counter -le 8 ]
 do
 	./obj/$counter.out diff/med > diff.txt
 	if ! diff -q diff/med diff.txt ; then
 		diff -y diff/med diff.txt
-		echo "❌BUFFER_SIZE=$counter [KO]"
-		echo "❌error: output differs from diff/empty"
+		echo "$uni_fail BUFFER_SIZE=$counter [KO]"
+		echo "$uni_fail error: output differs from diff/empty"
 	else
-		echo "✅BUFFER_SIZE=$counter [OK]"
+		echo "$uni_success BUFFER_SIZE=$counter [OK]"
 	fi
 	((counter++))
 done
 counter=1
 echo ""
-echo "➥ Comparing with diff/big"
+echo "$uni_arrow Comparing with diff/big"
 while [ $counter -le 8 ]
 do
 	./obj/$counter.out diff/big > diff.txt
 	if ! diff -q diff/big diff.txt ; then
 		diff -y diff/big diff.txt
-		echo "❌BUFFER_SIZE=$counter [KO]"
-		echo "❌error: output differs from diff/empty"
+		echo "$uni_fail BUFFER_SIZE=$counter [KO]"
+		echo "$uni_fail error: output differs from diff/empty"
 	else
-		echo "✅BUFFER_SIZE=$counter [OK]"
+		echo "$uni_success BUFFER_SIZE=$counter [OK]"
 	fi
 	((counter++))
 done
@@ -222,12 +227,12 @@ echo -e "\nAll good!\n"
 #Compiling with -fsanitize-address to test for leaks
 leaks_tests=true
 echo "-------------Testing leaks-------------"
-echo "➥ Compiling with BUFFER_SIZE=1"
+echo "$uni_arrow Compiling with BUFFER_SIZE=1"
 gcc -Wall -Werror -Wextra -g -fsanitize=address -D BUFFER_SIZE=1 src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/1_leaks_test.out
-echo "➥ Compiling with BUFFER_SIZE=512"
+echo "$uni_arrow Compiling with BUFFER_SIZE=512"
 gcc -Wall -Werror -Wextra -g -fsanitize=address -D BUFFER_SIZE=512 src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/512_leaks_test.out
 if ! ls obj/1_leaks_test.out || ! ls obj/512_leaks_test.out ; then
-	echo "❌Compiling failed. Skipping leaks tests..."
+	echo "$uni_fail Compiling failed. Skipping leaks tests..."
 	leaks_tests=false
 fi
 
@@ -237,9 +242,9 @@ if [ $leaks_tests == true ] ; then
 	if ! ./obj/1_leaks_test.out diff/small > /dev/null || ! ./obj/512_leaks_test.out diff/small > /dev/null ; then
 		echo "================================================================="
 		echo
-		echo "❌Your get_next_line leaks! [KO]"
+		echo "$uni_fail Your get_next_line leaks! [KO]"
 	else
 		echo
-		echo -e "✅Your get_next_line does not leak! [OK]"
+		echo -e "$uni_success Your get_next_line does not leak! [OK]"
 	fi
 fi
