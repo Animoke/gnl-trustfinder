@@ -155,148 +155,191 @@ WHITE='\033[1;37m'
 # Variables
 buffer_size=1
 counter=1
-uni_success="✅"
-uni_fail="❌"
+uni_success="${GREEN}✅${NOCOLOR}"
+uni_fail="${RED}❌${NOCOLOR}"
 uni_arrow="➥"
 uni_sep="❯"
 diff_ok="${GREEN}[OK]${NOCOLOR}"
 diff_ko="${RED}[KO]${NOCOLOR}"
 
+echo -e "${YELLOW}
+=======================================
+#######################################
+########### GNL-TRUSTFINDER ###########
+#######################################
+============❯ by gpatingr ❮============
+"
+echo -e "${YELLOW}
+=======================================
+#######################################
+########### GNL-TRUSTFINDER ###########
+#######################################
+============❯ by gpatingr ❮============
+" >> DEEPTHOUGHT
+
 # Copying sources
 
 #if [ getopts b: flag == false ] ; then
-	echo -e "${YELLOW}----------------Copying----------------${NOCOLOR}"
-	cp $src_path/get_next_line.c src/get_next_line.c && echo "$uni_arrow cp $src_path/get_next_line.c src/get_next_line.c"
-	cp $src_path/get_next_line_utils.c src/get_next_line_utils.c && echo "$uni_arrow cp $src_path/get_next_line_utils.c src/get_next_line_utils.c"
-	cp $src_path/get_next_line.h src/get_next_line.h && echo "$uni_arrow cp $src_path/get_next_line.h src/get_next_line.h"
-	echo ""
+	echo -e "\n${YELLOW}----------------Copying----------------${NOCOLOR}"
+	echo -e "\n${YELLOW}----------------Copying----------------${NOCOLOR}" >> DEEPTHOUGHT
+	cp $src_path/get_next_line.c src/get_next_line.c && echo -e "$uni_arrow cp $src_path/get_next_line.c src/get_next_line.c"
+	cp $src_path/get_next_line_utils.c src/get_next_line_utils.c && echo -e "$uni_arrow cp $src_path/get_next_line_utils.c src/get_next_line_utils.c"
+	cp $src_path/get_next_line.h src/get_next_line.h && echo -e "$uni_arrow cp $src_path/get_next_line.h src/get_next_line.h"
+	# DEEPTHOUGHT log
+	echo -e "$uni_arrow cp $src_path/get_next_line.c src/get_next_line.c" >> DEEPTHOUGHT
+	echo -e "$uni_arrow cp $src_path/get_next_line_utils.c src/get_next_line_utils.c" >> DEEPTHOUGHT
+	echo -e "$uni_arrow cp $src_path/get_next_line.h src/get_next_line.h" >> DEEPTHOUGHT
+	
+	echo "" && echo "" >> DEEPTHOUGHT
 	if ! ls src/get_next_line.c || ! ls src/get_next_line.h || ! ls src/get_next_line_utils.c ; then
 		echo "$uni_fail error: files could not be copied"
+		echo "$uni_fail error: files could not be copied" >> DEEPTHOUGHT
 		exit_err
 	fi
 
 	echo ""
 	echo -n "$uni_arrow    " && ls -l src/
-	echo "$uni_sucess Files successfully copied into src/"
-	echo ""
+	echo -e "$uni_success Files successfully copied into src/" && echo -e "$uni_success Files successfully copied into src/" >> DEEPTHOUGHT
+	echo "" && echo "" >> DEEPTHOUGHT
 #fi
 
 # Compiling from sources (no bonus)
 echo -e "${YELLOW}---------------Compiling---------------${NOCOLOR}"
+echo -e "${YELLOW}---------------Compiling---------------${NOCOLOR}" >> DEEPTHOUGHT
 while [ $buffer_size -le 8 ]
 do
-	echo -ne "$uni_arrow  ${LIGHTBLUE}"
+	echo -ne "$uni_arrow  ${LIGHTBLUE}" && echo -ne "$uni_arrow  ${LIGHTBLUE}" >> DEEPTHOUGHT
 	gcc -Wall -Werror -Wextra -D BUFFER_SIZE=$buffer_size src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/$buffer_size.out
+	echo -e "gcc -Wall -Werror -Wextra -D BUFFER_SIZE=$buffer_size src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/$buffer_size.out" >> DEEPTHOUGHT
 	if ! ls obj/$buffer_size.out ; then
-		echo -e "${NOCOLOR} $uni_fail $buffer_size ${uni_cep}${RED} error: compilation failed. View DEEPTOUGHT for more info"
+		echo -e "${NOCOLOR} $uni_fail $buffer_size ${uni_sep}${RED} error: compilation failed. View DEEPTOUGHT for more info"
+		echo -e "$uni_fail${RED}Compilation failed.${NOCOLOR}" >> DEEPTHOUGHT
+		gcc -Wall -Werror -Wextra -D BUFFER_SIZE=$buffer_size src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/$buffer_size.out 2>> DEEPTHOUGHT
 	else
 		echo -e "${NOCOLOR} $uni_success $buffer_size ${uni_sep}${GREEN} Compilation successful"
+		echo -e "${NOCOLOR} $uni_success $buffer_size ${uni_sep}${GREEN} Compilation successful" >> DEEPTHOUGHT
 	fi
-	echo -ne "${NOCOLOR}"
+	echo -ne "${NOCOLOR}" && echo -ne "${NOCOLOR}" >> DEEPTHOUGHT
 	((buffer_size++))
 done
 
-echo ""
+echo "" && echo "" >> DEEPTHOUGHT
 
 # Comparing output and input file with diff/*
-diff_output=true
+diff_output=1
 echo -e "${YELLOW}-----------Comparing outputs-----------${NOCOLOR}"
+echo -e "${YELLOW}-----------Comparing outputs-----------${NOCOLOR}" >> DEEPTHOUGHT
 echo ""
-echo "$uni_arrow Comparing with diff/empty"
+echo -e "$uni_arrow Comparing with diff/empty" && echo -e "$uni_arrow Comparing with diff/empty" >> DEEPTHOUGHT
 while [ $counter -le 8 ]
 do
 	./obj/$counter.out diff/empty > diff.txt
 	if ! diff -q diff/empty diff.txt ; then
-		diff -y diff/empty diff.txt
+		diff diff/empty diff.txt >> DEEPTHOUGHT
 		echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
-		echo "$uni_fail error: output differs from diff/empty"
-		(($diff_output=true))
+		echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko" >> DEEPTHOUGHT
+		echo -e "$uni_fail error: output differs from diff/empty"
+		((diff_output=1))
 	else
 		echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
-		(($diff_output=false))
+		echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok" >> DEEPTHOUGHT
+		((diff_output=0))
 	fi
 	echo -ne "$NOCOLOR"
 	((counter++))
 done
 counter=1
-echo ""
-echo "$uni_arrow Comparing with diff/rly_small"
+empty_diff=$diff_output
+echo "" && echo "" >> DEEPTHOUGHT
+echo -e "$uni_arrow Comparing with diff/rly_small" && echo -e "$uni_arrow Comparing with diff/rly_small" >> DEEPTHOUGHT
 while [ $counter -le 8 ]
 do
 	./obj/$counter.out diff/rly_small > diff.txt
 	if ! diff -q diff/rly_small diff.txt ; then
-		diff -y diff/rly_small diff.txt
+		diff diff/rly_small diff.txt >> DEEPTHOUGHT
 		echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
-		echo "$uni_fail error: output differs from diff/empty"
-		(($diff_output=true))
+		echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko" >> DEEPTHOUGHT
+		echo -e "$uni_fail error: output differs from diff/empty"
+		((diff_output=1))
 	else
 		echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
-		(($diff_output=false))
+		echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok" >> DEEPTHOUGHT
+		((diff_output=0))
 	fi
 	((counter++))
 	echo -ne "$NOCOLOR"
 done
 counter=1
-echo ""
-echo "$uni_arrow Comparing with diff/small"
+rly_small_diff=$diff_output
+echo "" && echo "" >> DEEPTHOUGHT
+echo -e "$uni_arrow Comparing with diff/small" && echo -e "$uni_arrow Comparing with diff/small" >> DEEPTHOUGHT
 while [ $counter -le 8 ]
 do
 	./obj/$counter.out diff/small > diff.txt
 	if ! diff -q diff/small diff.txt ; then
-		diff -y diff/small diff.txt
+		diff diff/small diff.txt >> DEEPTHOUGHT
 		echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
-		echo "$uni_fail error: output differs from diff/empty"
-		(($diff_output=true))
+		echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko" >> DEEPTHOUGHT
+		echo -e "$uni_fail error: output differs from diff/empty"
+		((diff_output=1))
 	else
 		echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
-		(($diff_output=false))
+		echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok" >> DEEPTHOUGHT
+		((diff_output=0))
 	fi
 	((counter++))
 	echo -ne "$NOCOLOR"
 done
 counter=1
-echo ""
-echo "$uni_arrow Comparing with diff/med"
+small_diff=$diff_output
+echo "" && echo "" >> DEEPTHOUGHT
+echo -e "$uni_arrow Comparing with diff/med" && echo -e "$uni_arrow Comparing with diff/med" >> DEEPTHOUGHT
 while [ $counter -le 8 ]
 do
 	./obj/$counter.out diff/med > diff.txt
 	if ! diff -q diff/med diff.txt ; then
-		diff -y diff/med diff.txt
+		diff diff/med diff.txt >> DEEPTHOUGHT
 		echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
-		echo "$uni_fail error: output differs from diff/empty"
-		(($diff_output=true))
+		echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko" >> DEEPTHOUGHT
+		echo -e "$uni_fail error: output differs from diff/empty"
+		((diff_output=1))
 	else
 		echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
-		(($diff_output=false))
+		echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok" >> DEEPTHOUGHT
+		((diff_output=0))
 	fi
 	((counter++))
 	echo -ne "$NOCOLOR"
 done
 counter=1
-echo ""
-echo "$uni_arrow Comparing with diff/big"
+med_diff=$diff_output
+echo "" && echo "" >> DEEPTHOUGHT
+echo -e "$uni_arrow Comparing with diff/big" && echo -e "$uni_arrow Comparing with diff/big" >> DEEPTHOUGHT
 while [ $counter -le 8 ]
 do
 	./obj/$counter.out diff/big > diff.txt
 	if ! diff -q diff/big diff.txt ; then
-		diff -y diff/big diff.txt
+		diff diff/big diff.txt >> DEEPTHOUGHT
 		echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
-		echo "$uni_fail error: output differs from diff/empty"
-		(($diff_output=true))
+		echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko" >> DEEPTHOUGHT
+		echo -e "$uni_fail error: output differs from diff/empty"
+		((diff_output=1))
 	else
 		echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
-		(($diff_output=false))
+		echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok" >> DEEPTHOUGHT
+		((diff_output=0))
 	fi
 	((counter++))
 	echo -ne "$NOCOLOR"
 done
-echo ""
-if [ $diff_output ] ; then
-	echo -e "${GREEN}All good!${NOCOLOR}"
+echo "" && echo "" >> DEEPTHOUGHT
+if [ $diff_output == 0 ] && [ $empty_diff == 0 ] && [ $rly_small_diff == 0 ] && [ $small_diff == 0 ] && [ $med_diff == 0 ] ; then
+	echo -e "${GREEN}All good!${NOCOLOR}" && echo -e "${GREEN}All good!${NOCOLOR}" >> DEEPTHOUGHT
 else
 	echo -e "${RED}One or more tests failed. Check DEEPTHOUGHT for logs${NOCOLOR}"
+	echo -e "${RED}One or more tests failed.${NOCOLOR}" >> DEEPTHOUGHT
 fi
-echo ""
+echo "" && echo "" >> DEEPTHOUGHT
 
 # Compiling with -fsanitize-address to test for leaks
 leaks_tests=true
