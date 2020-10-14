@@ -341,27 +341,43 @@ else
 fi
 echo "" && echo "" >> DEEPTHOUGHT
 
-# Compiling with -fsanitize-address to test for leaks
+# Compiling with -fsanitize=address to test for leaks
 leaks_tests=true
 echo -e "${YELLOW}-------------Testing leaks-------------${NOCOLOR}"
-echo "$uni_arrow Compiling with BUFFER_SIZE=1"
+echo -e "${YELLOW}-------------Testing leaks-------------${NOCOLOR}" >> DEEPTHOUGHT
+echo -e "$uni_arrow ${LIGHTBLUE}Compiling with BUFFER_SIZE=1" && echo -e "$uni_arrow ${LIGHTBLUE}Compiling with BUFFER_SIZE=1" >> DEEPTHOUGHT
 gcc -Wall -Werror -Wextra -g -fsanitize=address -D BUFFER_SIZE=1 src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/1_leaks_test.out
-echo "$uni_arrow Compiling with BUFFER_SIZE=512"
+echo -e "${NOCOLOR}gcc -Wall -Werror -Wextra -g -fsanitize=address -D BUFFER_SIZE=1 src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/1_leaks_test.out" >> DEEPTHOUGHT
+echo -e "$uni_arrow ${LIGHTBLUE}Compiling with BUFFER_SIZE=512" && echo -e "$uni_arrow ${LIGHTBLUE}Compiling with BUFFER_SIZE=512" >> DEEPTHOUGHT
 gcc -Wall -Werror -Wextra -g -fsanitize=address -D BUFFER_SIZE=512 src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/512_leaks_test.out
+echo -e "${NOCOLOR}gcc -Wall -Werror -Wextra -g -fsanitize=address -D BUFFER_SIZE=512 src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/512_leaks_test.out" >> DEEPTHOUGHT
+echo -ne "${NOCOLOR}\nls -l obj/1_leaks.out obj/512_leaks.out\n" >> DEEPTHOUGHT
+ls -l obj/1_leaks_test.out obj/512_leaks_test.out >> DEEPTHOUGHT
 if ! ls obj/1_leaks_test.out || ! ls obj/512_leaks_test.out ; then
 	echo -e "$uni_fail ${RED}Compiling failed. Skipping leaks tests..."
+	echo -e "$uni_fail ${RED}Compiling failed. Skipping leaks tests..." >> DEEPTHOUGHT
+	gcc -Wall -Werror -Wextra -g -fsanitize=address -D BUFFER_SIZE=1 src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/1_leaks_test.out 2>> DEEPTHOUGHT
+	gcc -Wall -Werror -Wextra -g -fsanitize=address -D BUFFER_SIZE=512 src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/1_leaks_test.out 2>> DEEPTHOUGHT
 	leaks_tests=false
 fi
+echo -e "${NOCOLOR}" && echo -e "${NOCOLOR}" >> DEEPTHOUGHT
 
+# Testing if leaks are detected by -fsanitize=address
 if [ $leaks_tests == true ] ; then
-#	./obj/1_leaks_test.out diff/small > /dev/null
-#	./obj/512_leaks_test.out diff/small > /dev/null
-	if ! ./obj/1_leaks_test.out diff/small > /dev/null || ! ./obj/512_leaks_test.out diff/small > /dev/null ; then
+	if ! ./obj/1_leaks_test.out diff/small > /dev/null ; then
 		echo "================================================================="
-		echo
-		echo -e "$uni_fail Your get_next_line leaks! $diff_ko"
+		./obj/1_leaks_test.out diff/small 2>> DEEPTHOUGHT
+		echo "=================================================================" >> DEEPTHOUGHT
+		echo -e "$uni_fail [1] Your get_next_line leaks! $diff_ko"
 	else
-		echo
-		echo -e "$uni_success Your get_next_line does not leak! $diff_ok"
+		echo -e "$uni_success [1] Your get_next_line does not leak!   $diff_ok"
+	fi
+	if ! ./obj/512_leaks_test.out diff/small > /dev/null ; then
+		echo "================================================================="
+		./obj/512_leaks_test.out diff/small 2>> DEEPTHOUGHT
+		echo "=================================================================" >> DEEPTHOUGHT
+		echo -e "$uni_fail [512] Your get_next_line leaks! $diff_ko"
+	else
+		echo -e "$uni_success [512] Your get_next_line does not leak! $diff_ok"	
 	fi
 fi
