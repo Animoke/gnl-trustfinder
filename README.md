@@ -1,4 +1,4 @@
-# gnl_tester
+# gnl_trustfinder
 Tester for get_next_line in 42cursus. This is a work in progress, please DM me on slack if you find bugs.
 
 This tester will compile with different BUFFER_SIZE values (1 to 8 for now, i will add a flag to test with more) and compare the output file with the original one.
