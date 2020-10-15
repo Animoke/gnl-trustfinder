@@ -365,12 +365,12 @@ function leaks_test()
 	leaks_tests=true
 	echo -e "${YELLOW}-------------Testing leaks-------------${NOCOLOR}"
 	echo -e "${YELLOW}-------------Testing leaks-------------${NOCOLOR}" >> DEEPTHOUGHT
-	echo -e "$uni_arrow ${LIGHTBLUE}Compiling with BUFFER_SIZE=1" && echo -e "$uni_arrow ${LIGHTBLUE}Compiling with BUFFER_SIZE=1" >> DEEPTHOUGHT
+	echo -e "${LIGHTBLUE}$uni_arrow Compiling with BUFFER_SIZE=1" && echo -e "${LIGHTBLUE}$uni_arrow Compiling with BUFFER_SIZE=1" >> DEEPTHOUGHT
 	gcc -Wall -Werror -Wextra -g -fsanitize=address -D BUFFER_SIZE=1 src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/1_leaks_test.out
-	echo -e "${NOCOLOR}gcc -Wall -Werror -Wextra -g -fsanitize=address -D BUFFER_SIZE=1 src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/1_leaks_test.out" >> DEEPTHOUGHT
-	echo -e "$uni_arrow ${LIGHTBLUE}Compiling with BUFFER_SIZE=512" && echo -e "$uni_arrow ${LIGHTBLUE}Compiling with BUFFER_SIZE=512" >> DEEPTHOUGHT
+	echo -e "${LIGHTBLUE}gcc -Wall -Werror -Wextra -g -fsanitize=address -D BUFFER_SIZE=1 src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/1_leaks_test.out" >> DEEPTHOUGHT
+	echo -e "${LIGHTBLUE}$uni_arrow Compiling with BUFFER_SIZE=512" && echo -e "${LIGHTBLUE}$uni_arrow Compiling with BUFFER_SIZE=512" >> DEEPTHOUGHT
 	gcc -Wall -Werror -Wextra -g -fsanitize=address -D BUFFER_SIZE=512 src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/512_leaks_test.out
-	echo -e "${NOCOLOR}gcc -Wall -Werror -Wextra -g -fsanitize=address -D BUFFER_SIZE=512 src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/512_leaks_test.out" >> DEEPTHOUGHT
+	echo -e "${LIGHTBLUE}gcc -Wall -Werror -Wextra -g -fsanitize=address -D BUFFER_SIZE=512 src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/512_leaks_test.out" >> DEEPTHOUGHT
 	echo -ne "${NOCOLOR}\nls -l obj/1_leaks.out obj/512_leaks_test.out\n" >> DEEPTHOUGHT
 	ls -l obj/1_leaks_test.out obj/512_leaks_test.out >> DEEPTHOUGHT
 	if ! ls obj/1_leaks_test.out || ! ls obj/512_leaks_test.out ; then
@@ -431,12 +431,12 @@ function bonus_tests()
 	# Compiling bonus
 	echo -e "${YELLOW}------------Compiling bonus------------${NOCOLOR}"
 	echo -e "${YELLOW}------------Compiling bonus------------${NOCOLOR}" >> DEEPTHOUGHT
-	echo -e "${LIGHTBLUE}$uni_arrow Compiling with BUFFER_SIZE=1" && echo -e "$uni_arrow ${LIGHTBLUE}Compiling with BUFFER_SIZE=1" >> DEEPTHOUGHT
+	echo -e "${LIGHTBLUE}$uni_arrow Compiling with BUFFER_SIZE=1" && echo -e "${LIGHTBLUE}$uni_arrow Compiling with BUFFER_SIZE=1" >> DEEPTHOUGHT
 	gcc -Wall -Werror -Wextra -D BUFFER_SIZE=1 src/get_next_line_bonus.c src/get_next_line_utils_bonus.c mains/main_bonus.c -o obj/1_bonus_test.out
-	echo -e "${NOCOLOR}gcc -Wall -Werror -Wextra -D BUFFER_SIZE=1 src/get_next_line_bonus.c src/get_next_line_utils_bonus.c mains/main_bonus.c -o obj/1_bonus_test.out" >> DEEPTHOUGHT
-	echo -e "${LIGHTBLUE}$uni_arrow Compiling with BUFFER_SIZE=512" && echo -e "$uni_arrow ${LIGHTBLUE}Compiling with BUFFER_SIZE=512" >> DEEPTHOUGHT
+	echo -e "${LIGHTBLUE}gcc -Wall -Werror -Wextra -D BUFFER_SIZE=1 src/get_next_line_bonus.c src/get_next_line_utils_bonus.c mains/main_bonus.c -o obj/1_bonus_test.out" >> DEEPTHOUGHT
+	echo -e "${LIGHTBLUE}$uni_arrow Compiling with BUFFER_SIZE=512" && echo -e "${LIGHTBLUE}$uni_arrow Compiling with BUFFER_SIZE=512" >> DEEPTHOUGHT
 	gcc -Wall -Werror -Wextra -D BUFFER_SIZE=512 src/get_next_line_bonus.c src/get_next_line_utils_bonus.c mains/main_bonus.c -o obj/512_bonus_test.out
-	echo -e "${NOCOLOR}gcc -Wall -Werror -Wextra -D BUFFER_SIZE=512 src/get_next_line_bonus.c src/get_next_line_utils_bonus.c mains/main_bonus.c -o obj/512_bonus_test.out" >> DEEPTHOUGHT
+	echo -e "${LIGHTBLUE}gcc -Wall -Werror -Wextra -D BUFFER_SIZE=512 src/get_next_line_bonus.c src/get_next_line_utils_bonus.c mains/main_bonus.c -o obj/512_bonus_test.out" >> DEEPTHOUGHT
 	echo -ne "${NOCOLOR}\nls -l obj/1_leaks.out obj/512_leaks.out\n" >> DEEPTHOUGHT
 	ls -l obj/1_bonus_test.out obj/512_bonus_test.out >> DEEPTHOUGHT
 	if ! ls obj/1_bonus_test.out || ! ls obj/512_bonus_test.out ; then
@@ -480,9 +480,40 @@ function bonus_tests()
 		((diff_output=0))
 	fi
 	echo -ne "$NOCOLOR"
+	small_diff=$diff_output
+	echo "" && echo "" >> DEEPTHOUGHT
+
+	# To modify with diff/bonus_med
+	echo -e "$uni_arrow Comparing with diff/bonus_small" && echo -e "$uni_arrow Comparing with diff/bonus_small" >> DEEPTHOUGHT
+	./obj/1_bonus_test.out diff/bonus_small1 diff/bonus_small2 > diff.txt
+	./obj/512_bonus_test.out diff/bonus_small1 diff/bonus_small2 > diff2.txt
+	if ! diff -q diff/bonus_small diff.txt > /dev/null ; then
+		diff diff/bonus_small diff.txt >> DEEPTHOUGHT
+		echo -e "$uni_fail BUFFER_SIZE=1   $diff_ko"
+		echo -e "$uni_fail BUFFER_SIZE=1   $diff_ko" >> DEEPTHOUGHT
+		echo -e "$uni_fail error: output differs from diff/empty"
+		((diff_output=1))
+	else
+		echo -e "$uni_success BUFFER_SIZE=1   $diff_ok"
+		echo -e "$uni_success BUFFER_SIZE=1   $diff_ok" >> DEEPTHOUGHT
+		((diff_output=0))
+	fi
+	if ! diff -q diff/bonus_small diff2.txt > /dev/null ; then
+		diff diff/bonus_small diff2.txt >> DEEPTHOUGHT
+		echo -e "$uni_fail BUFFER_SIZE=512 $diff_ko"
+		echo -e "$uni_fail BUFFER_SIZE=512 $diff_ko" >> DEEPTHOUGHT
+		echo -e "$uni_fail error: output differs from diff/empty"
+		((diff_output=1))
+	else
+		echo -e "$uni_success BUFFER_SIZE=512 $diff_ok"
+		echo -e "$uni_success BUFFER_SIZE=512 $diff_ok" >> DEEPTHOUGHT
+		((diff_output=0))
+	fi
+	echo -ne "$NOCOLOR"
 	empty_diff=$diff_output
 	echo "" && echo "" >> DEEPTHOUGHT
 	
+
 }
 
 function normal_tests()
