@@ -15,7 +15,7 @@ function exit_err()
 	exit 1
 }
 
-src_path="../gnl" #Change directory here
+src_path="../gnl-github" #Change directory here
 
 trap cleanup EXIT
 mkdir obj src diff mains
@@ -486,55 +486,56 @@ function normal_tests()
 	exit 0
 }
 
-#normal_tests
-echo first:$1
-echo nb:"$#"
-
-if ! [ $OPTARG ] || ! [ "$1" ] ; then
+if [ $# == 0 ] ; then
 	startup_welcome
-	echo nb0:"$#"
-#elif [ "$#" == 0 ] ; then
-#	normal_tests
-#	echo nb1:"$#"
-else
-	echo -e "${RED}Usage:${NOCOLOR}"
-	echo -e "    ${LIGHTBLUE}-t | --test    ${NOCOLOR}test flag"
-	echo -e "    options:
-                 ${LIGHTBLUE}normal${NOCOLOR}     normal mode
-                 ${LIGHTBLUE}leaks ${NOCOLOR}     only tests leaks
-                 ${LIGHTBLUE}bonus ${NOCOLOR}     only tests bonus
-                 ${LIGHTBLUE}all   ${NOCOLOR}     all tests"
-    echo -e "    ${LIGHTBLUE}-s | --skip ${NOCOLOR}   skip flag"
-	echo -e "    options:
-                 ---no options avalaible yet---"
-	echo -ne "\nExample:${LIGHTBLUE} ./gnl_trustfinder -t all${NOCOLOR}  <- this will run all the tests\n"
-	exit_err
+	normal_tests
 fi
 
-while getopts ":t:--test:s:--skip:" args; do
-echo "arg: $OPTARG"
-	case $args in
-		t | --test)
-			if [ $OPTARG == "est-normal" ] || [ ! $OPTARG ] || [ $OPTARG == "normal" ] ; then
-				normal_tests
-			elif [ $OPTARG == "est-leaks" ] || [ $OPTARG == "leaks" ] ; then
-				src_cpy_no_bonus
-				no_bonus_compilation
-				leaks_test
-			elif [ $OPTARG == "est-bonus" ] || [ $OPTARG == "bonus" ] ; then
-				bonus_tests
-			elif [ $OPTARG == "est-all" ] || [ $OPTARG == "all" ] ;then
-				src_cpy_no_bonus
-				no_bonus_compilation
-				normal_diff_tests
-				leaks_test
-				bonus_tests
-			fi
-		;;
-		s) echo $OPTARG;;
-		*) normal_tests
-	esac
-done
+function syntax_err()
+{
+	echo -e "${RED}Usage:${NOCOLOR}"
+	echo -e "${LIGHTCYAN}-t | --test    ${NOCOLOR}test flag"
+	echo -e "options:
+    ${LIGHTCYAN}normal${NOCOLOR}     normal mode
+    ${LIGHTCYAN}leaks ${NOCOLOR}     only tests leaks
+    ${LIGHTCYAN}bonus ${NOCOLOR}     only tests bonus
+    ${LIGHTCYAN}all   ${NOCOLOR}     all tests
+	"
+	echo -e "${LIGHTCYAN}-s | --skip ${NOCOLOR}   skip flag"
+	echo -e "options:
+    ${LIGHTCYAN}---no options avalaible yet---${NOCOLOR}"
+	echo -ne "\nExample:${LIGHTBLUE} ./gnl_trustfinder -t all${NOCOLOR}  <- this will run all the tests\n"
+	echo -ne "\nExample:${LIGHTBLUE} ./gnl_trustfinder --test all${NOCOLOR}  <- this will also run all the tests\n"
+	exit_err
+}
+case $1 in
+	-t | --test)
+		if [ "$2" == "normal" ] || [ "$OPTARG" == "normal" ] ; then
+			startup_welcome
+			normal_tests
+		elif [ "$2" == "leaks" ] || [ "$OPTARG" == "leaks" ] ; then
+			startup_welcome
+			src_cpy_no_bonus
+			no_bonus_compilation
+			leaks_test
+		elif [ "$2" == "bonus" ] || [ "$OPTARG" == "bonus" ] ; then
+			startup_welcome
+			bonus_tests
+		elif [ "$2" == "all" ] || [ "$OPTARG" == "all" ] ;then
+			startup_welcome
+			src_cpy_no_bonus
+			no_bonus_compilation
+			normal_diff_tests
+			leaks_test
+			bonus_tests
+		else
+			syntax_err
+		fi
+	;;
+	s) echo $OPTARG;;
+	*) syntax_err;;
+
+esac
 echo ""
 
 exit 0
