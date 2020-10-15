@@ -24,7 +24,7 @@ mkdir obj src diff mains
 echo -n "" > DEEPTHOUGHT
 echo -n "" > diff/empty
 echo -e "\n" > diff/rly_small
-echo -e "The answer to the ultimate question of life, the universe and everything is 42.\n" > diff/small
+echo -e "The answer to the ultimate question of life, the universe and everything is 42." > diff/small
 echo "The battle between the CLONES and the DROIDS rages throughout the sinkhole. OBI-WAN rides up to CLONE COMMANDER CODY.
 OBI-WAN: Commander, contact your troops. Tell them to move to the higher levels.
 CLONE COMMANDER CODY: Very good, sir.
@@ -87,6 +87,13 @@ Find the power lost underneath the ground
 Let it all blow in the sky
 " > diff/big
 
+# Bonus test files
+echo -n "The answer to the ultimate question of life,
+the universe and everything is 42.
+" > diff/bonus_small
+echo "The answer to the ultimate question of life," > diff/bonus_small1
+echo "the universe and everything is 42." > diff/bonus_small2
+
 echo "#include \"../src/get_next_line.h\"
 #include <stdio.h>
 #include <fcntl.h>
@@ -129,9 +136,9 @@ int		main(int ac, char **av)
 			free(line);
 		}
 	}
-	free(line);
 	return (0);
-}" > mains/main_bonus.c
+}	
+" > mains/main_bonus.c
 
 # Colors
 NOCOLOR='\033[0m'
@@ -154,8 +161,10 @@ WHITE='\033[1;37m'
 # Variables
 buffer_size=1
 counter=1
-uni_success="${GREEN}✅${NOCOLOR}"
-uni_fail="${RED}❌${NOCOLOR}"
+#uni_success="${GREEN}✅${NOCOLOR}"
+uni_success="${GREEN}✓${NOCOLOR}"
+#uni_fail="${RED}❌${NOCOLOR}"
+uni_fail="${RED}✗${NOCOLOR}"
 uni_arrow="➥"
 uni_sep="❯"
 diff_ok="${GREEN}[OK]${NOCOLOR}"
@@ -422,10 +431,10 @@ function bonus_tests()
 	# Compiling bonus
 	echo -e "${YELLOW}------------Compiling bonus------------${NOCOLOR}"
 	echo -e "${YELLOW}------------Compiling bonus------------${NOCOLOR}" >> DEEPTHOUGHT
-	echo -e "$uni_arrow ${LIGHTBLUE}Compiling with BUFFER_SIZE=1" && echo -e "$uni_arrow ${LIGHTBLUE}Compiling with BUFFER_SIZE=1" >> DEEPTHOUGHT
+	echo -e "${LIGHTBLUE}$uni_arrow Compiling with BUFFER_SIZE=1" && echo -e "$uni_arrow ${LIGHTBLUE}Compiling with BUFFER_SIZE=1" >> DEEPTHOUGHT
 	gcc -Wall -Werror -Wextra -D BUFFER_SIZE=1 src/get_next_line_bonus.c src/get_next_line_utils_bonus.c mains/main_bonus.c -o obj/1_bonus_test.out
 	echo -e "${NOCOLOR}gcc -Wall -Werror -Wextra -D BUFFER_SIZE=1 src/get_next_line_bonus.c src/get_next_line_utils_bonus.c mains/main_bonus.c -o obj/1_bonus_test.out" >> DEEPTHOUGHT
-	echo -e "$uni_arrow ${LIGHTBLUE}Compiling with BUFFER_SIZE=512" && echo -e "$uni_arrow ${LIGHTBLUE}Compiling with BUFFER_SIZE=512" >> DEEPTHOUGHT
+	echo -e "${LIGHTBLUE}$uni_arrow Compiling with BUFFER_SIZE=512" && echo -e "$uni_arrow ${LIGHTBLUE}Compiling with BUFFER_SIZE=512" >> DEEPTHOUGHT
 	gcc -Wall -Werror -Wextra -D BUFFER_SIZE=512 src/get_next_line_bonus.c src/get_next_line_utils_bonus.c mains/main_bonus.c -o obj/512_bonus_test.out
 	echo -e "${NOCOLOR}gcc -Wall -Werror -Wextra -D BUFFER_SIZE=512 src/get_next_line_bonus.c src/get_next_line_utils_bonus.c mains/main_bonus.c -o obj/512_bonus_test.out" >> DEEPTHOUGHT
 	echo -ne "${NOCOLOR}\nls -l obj/1_leaks.out obj/512_leaks.out\n" >> DEEPTHOUGHT
@@ -445,11 +454,11 @@ function bonus_tests()
 	echo -e "${YELLOW}--------Comparing bonus outputs--------${NOCOLOR}"
 	echo -e "${YELLOW}--------Comparing bonus outputs--------${NOCOLOR}" >> DEEPTHOUGHT
 	echo ""
-	echo -e "$uni_arrow Comparing with diff/empty" && echo -e "$uni_arrow Comparing with diff/empty" >> DEEPTHOUGHT
-	./obj/1_bonus_test.out diff/empty > diff.txt
-	./obj/512_bonus_test.out diff/empty > diff2.txt
-	if ! diff -q diff/empty diff.txt > /dev/null ; then
-		diff diff/empty diff.txt >> DEEPTHOUGHT
+	echo -e "$uni_arrow Comparing with diff/bonus_small" && echo -e "$uni_arrow Comparing with diff/bonus_small" >> DEEPTHOUGHT
+	./obj/1_bonus_test.out diff/bonus_small1 diff/bonus_small2 > diff.txt
+	./obj/512_bonus_test.out diff/bonus_small1 diff/bonus_small2 > diff2.txt
+	if ! diff -q diff/bonus_small diff.txt > /dev/null ; then
+		diff diff/bonus_small diff.txt >> DEEPTHOUGHT
 		echo -e "$uni_fail BUFFER_SIZE=1   $diff_ko"
 		echo -e "$uni_fail BUFFER_SIZE=1   $diff_ko" >> DEEPTHOUGHT
 		echo -e "$uni_fail error: output differs from diff/empty"
@@ -459,8 +468,8 @@ function bonus_tests()
 		echo -e "$uni_success BUFFER_SIZE=1   $diff_ok" >> DEEPTHOUGHT
 		((diff_output=0))
 	fi
-	if ! diff -q diff/empty diff2.txt > /dev/null ; then
-		diff diff/empty diff2.txt >> DEEPTHOUGHT
+	if ! diff -q diff/bonus_small diff2.txt > /dev/null ; then
+		diff diff/bonus_small diff2.txt >> DEEPTHOUGHT
 		echo -e "$uni_fail BUFFER_SIZE=512 $diff_ko"
 		echo -e "$uni_fail BUFFER_SIZE=512 $diff_ko" >> DEEPTHOUGHT
 		echo -e "$uni_fail error: output differs from diff/empty"
@@ -493,7 +502,8 @@ fi
 
 function syntax_err()
 {
-	echo -e "${RED}Usage:${NOCOLOR}"
+	echo -ne "${RED}Usage:${NOCOLOR}\n\n"
+	echo -e "${LIGHTCYAN}-h | --help    ${NOCOLOR}display this message"
 	echo -e "${LIGHTCYAN}-t | --test    ${NOCOLOR}test flag"
 	echo -e "options:
     ${LIGHTCYAN}normal${NOCOLOR}     normal mode
@@ -504,8 +514,8 @@ function syntax_err()
 	echo -e "${LIGHTCYAN}-s | --skip ${NOCOLOR}   skip flag"
 	echo -e "options:
     ${LIGHTCYAN}---no options avalaible yet---${NOCOLOR}"
-	echo -ne "\nExample:${LIGHTBLUE} ./gnl_trustfinder -t all${NOCOLOR}  <- this will run all the tests\n"
-	echo -ne "\nExample:${LIGHTBLUE} ./gnl_trustfinder --test all${NOCOLOR}  <- this will also run all the tests\n"
+	echo -ne "\nExample:${LIGHTCYAN} ./gnl_trustfinder -t all${NOCOLOR}  <- this will run all the tests\n"
+	echo -ne "Example:${LIGHTCYAN} ./gnl_trustfinder --test all${NOCOLOR}  <- this will also run all the tests\n"
 	exit_err
 }
 case $1 in
@@ -532,7 +542,7 @@ case $1 in
 			syntax_err
 		fi
 	;;
-	s) echo $OPTARG;;
+	-h | --help) syntax_err;;
 	*) syntax_err;;
 
 esac
