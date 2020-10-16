@@ -4,6 +4,7 @@ get_next_line tester
 
 Default:
 Running 𝘨𝘯𝘭-𝘵𝘳𝘶𝘴𝘵𝘧𝘪𝘯𝘥𝘦𝘳.𝘴𝘩 without any flag will do the same as 𝘨𝘯𝘭-𝘵𝘳𝘶𝘴𝘵𝘧𝘪𝘯𝘥𝘦𝘳.𝘴𝘩 --𝘵𝘦𝘴𝘵 𝘯𝘰𝘳𝘮𝘢𝘭
+
 A DEEPTHOUGHT file is generated during the execution of the script.
 
 Usage:
