@@ -1,16 +1,22 @@
 # gnl-trustfinder
 
+
 get_next_line tester
 
+
 Default:
+
 Running 𝘨𝘯𝘭-𝘵𝘳𝘶𝘴𝘵𝘧𝘪𝘯𝘥𝘦𝘳.𝘴𝘩 without any flag will do the same as 𝘨𝘯𝘭-𝘵𝘳𝘶𝘴𝘵𝘧𝘪𝘯𝘥𝘦𝘳.𝘴𝘩 --𝘵𝘦𝘴𝘵 𝘯𝘰𝘳𝘮𝘢𝘭
 
 A DEEPTHOUGHT file is generated during the execution of the script.
 
 Usage:
+
 Change your gnl directory in 𝘨𝘯𝘭-𝘵𝘳𝘶𝘴𝘵𝘧𝘪𝘯𝘥𝘦𝘳.𝘴𝘩 :
-  src_path="../𝘺𝘰𝘶𝘳_𝘱𝘢𝘵𝘩" --- default path is "../𝘨𝘯𝘭"
-  
+
+src_path="../𝘺𝘰𝘶𝘳_𝘱𝘢𝘵𝘩" --- default path is "../𝘨𝘯𝘭"
+
+
   ./gnl-trustfinder [-$f] [$option]
   ./gnl-trustfinder [--$flag] [$option]
 
