@@ -22,6 +22,9 @@ mkdir obj src diff mains
 
 #Making files so the tester only has one file to download
 echo -n "" > DEEPTHOUGHT
+
+function normal_files_init()
+{
 echo -n "" > diff/empty
 echo -e "\n" > diff/rly_small
 echo -e "The answer to the ultimate question of life, the universe and everything is 42." > diff/small
@@ -86,7 +89,10 @@ Let 'em all scream in the night
 Find the power lost underneath the ground
 Let it all blow in the sky
 " > diff/big
+}
 
+function bonus_files_init()
+{
 # Bonus test files
 echo -n "The answer to the ultimate question of life,
 the universe and everything is 42.
@@ -209,11 +215,35 @@ Let 'em all go in the sky
 Let it all blow in the sky
 Let 'em all scream in the night
 Let it all blow in the sky" > diff/bonus_big2
+}
 
+function huge_files_init()
+{
+	echo -e "${YELLOW}---------Generating  diff/huge---------${NOCOLOR}"
+	echo -e "${YELLOW}---------Generating  diff/huge---------${NOCOLOR}" >> DEEPTHOUGHT
+	echo -n > diff/huge
+	echo -ne "\nGenerating diff/huge... this may take a minute." && echo "\nGenerating diff/huge... this may take a minute." >> DEEPTHOUGHT
+	counter=1
+	while [ $counter -le 48000 ]
+	do
+		echo -ne "$counter j'ai pas d'inspi pour le texte\n" >> diff/huge
+		((counter++))
+	done
+	if wc -l diff/huge | grep 48000 > /dev/null ; then
+		echo -ne "\n$uni_success diff/huge successfully generated.\n"
+	else
+		echo -ne "\n$uni_fail diff/huge did not generate correctly. Would you like to retry? "
+		read -p '[Y/n] ' retry
+		if [ "$retry" == "Y" ] ; then	
+			huge_files_init
+		else
+			echo "Exiting..."
+			exit_err
+		fi
+	fi
+}
 
-
-
-
+# Generating main files
 echo "#include \"../src/get_next_line.h\"
 #include <stdio.h>
 #include <fcntl.h>
@@ -288,14 +318,14 @@ echo -e "${YELLOW}
 ########### GNL-TRUSTFINDER ###########
 #######################################
 ============❯ by gpatingr ❮============
-"
+${NOCOLOR}"
 echo -e "${YELLOW}
 =======================================
 #######################################
 ########### GNL-TRUSTFINDER ###########
 #######################################
 ============❯ by gpatingr ❮============
-" >> DEEPTHOUGHT
+${NOCOLOR}" >> DEEPTHOUGHT
 }
 
 function src_cpy_no_bonus()
@@ -704,8 +734,41 @@ function bonus_tests()
 
 }
 
+function huge_file()
+{
+	counter=1
+	echo -e "${YELLOW}------Comparing huge file outputs------${NOCOLOR}"
+	echo -e "${YELLOW}------Comparing huge file outputs------${NOCOLOR}" >> DEEPTHOUGHT
+	echo "" && echo "" >> DEEPTHOUGHT
+	echo -e "$uni_arrow Comparing with diff/huge" && echo -e "$uni_arrow Comparing with diff/huge" >> DEEPTHOUGHT
+	while [ $counter -le 8 ]
+	do
+		./obj/$counter.out diff/huge > diff.txt
+		if ! diff -q diff/huge diff.txt > /dev/null ; then
+			diff diff/huge diff.txt >> DEEPTHOUGHT
+			echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
+			echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko" >> DEEPTHOUGHT
+			echo -e "$uni_fail error: output differs from diff/huge"
+			((diff_output=1))
+		else
+			echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
+			echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok" >> DEEPTHOUGHT
+			((diff_output=0))
+		fi
+		((counter++))
+		echo -ne "$NOCOLOR"
+	done
+	if [ "$diff_output" == 0 ] ; then
+		echo -e "${GREEN}All good!${NOCOLOR}" && echo -e "${GREEN}All good!${NOCOLOR}" >> DEEPTHOUGHT
+	else
+		echo -e "${RED}One or more bonus tests failed. Check DEEPTHOUGHT for logs${NOCOLOR}"
+		echo -e "${RED}One or more bonus tests failed.${NOCOLOR}" >> DEEPTHOUGHT
+	fi
+}
+
 function normal_tests()
 {
+	normal_files_init
 	src_cpy_no_bonus
 	no_bonus_compilation
 	normal_diff_tests
@@ -730,10 +793,9 @@ function syntax_err()
         ${LIGHTCYAN}l | leaks ${NOCOLOR}     only tests leaks
         ${LIGHTCYAN}b | bonus ${NOCOLOR}     only tests bonus
         ${LIGHTCYAN}a | all   ${NOCOLOR}     all tests
-	"
-	echo -ne "\n  ${LIGHTCYAN}-s | --skip ${NOCOLOR}   skip flag\n\n"
-	echo -e "options:
-        ${LIGHTCYAN}---no options avalaible yet---${NOCOLOR}"
+       ${LIGHTCYAN}hf | huge-file ${NOCOLOR} test with huge file (48000 lines)\n\n"
+#	echo -e "options:
+#        ${LIGHTCYAN}---no options avalaible yet---${NOCOLOR}"
 	echo -ne "\n${GREEN}Examples:${NOCOLOR}
 These commands will run the same tests
 ${LIGHTCYAN}./gnl_trustfinder -t all${NOCOLOR}
@@ -749,19 +811,29 @@ case $1 in
 			normal_tests
 		elif [ "$2" == "leaks" ] || [ "$2" == "l" ] ; then
 			startup_welcome
+			normal_files_init
 			src_cpy_no_bonus
 			no_bonus_compilation
 			leaks_test
 		elif [ "$2" == "bonus" ] || [ "$2" == "b" ] ; then
+			bonus_files_init
 			startup_welcome
 			bonus_tests
-		elif [ "$2" == "all" ] || [ "$2" == "a" ] ;then
+		elif [ "$2" == "all" ] || [ "$2" == "a" ] ; then
 			startup_welcome
+			normal_files_init
+			bonus_files_init
 			src_cpy_no_bonus
 			no_bonus_compilation
 			normal_diff_tests
 			leaks_test
 			bonus_tests
+		elif [ "$2" == "huge-file" ] || [ "$2" == "hf" ] ; then
+			startup_welcome
+			huge_files_init
+			src_cpy_no_bonus
+			no_bonus_compilation
+			huge_file
 		else
 			syntax_err
 		fi
