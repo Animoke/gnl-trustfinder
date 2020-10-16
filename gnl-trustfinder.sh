@@ -15,7 +15,7 @@ function exit_err()
 	exit 1
 }
 
-src_path="../gnl-github" #Change directory here
+src_path="../gnl" #Change directory here
 
 trap cleanup EXIT
 mkdir obj src diff mains
