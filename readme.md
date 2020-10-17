@@ -21,8 +21,8 @@ Change your gnl directory in 𝘨𝘯𝘭-𝘵𝘳𝘶𝘴𝘵𝘧𝘪𝘯𝘥�
 |**-a**          |**--huge-file**         |only tests leaks                   |
    
 **Example**: running `./gnl-trustfinder -b` will test for bonus, without testing the rest.   
-
-**Features:**
+   
+# Features:
 
 -   Normal mode: The normal mode will compile your files with a `BUFFER_SIZE` of 1 to 8. It will then compare the output of the binary and compare it with the input file (in the `diff/` directory when the programm is running). The leaks test uses `*-fsanitize=address*` on compilation to look for more informations if there are leaks.
     
@@ -35,7 +35,7 @@ Change your gnl directory in 𝘨𝘯𝘭-𝘵𝘳𝘶𝘴𝘵𝘧𝘪𝘯𝘥�
 -   Huge-file mode: This mode will generate a huge file (48000 lines) into `diff/huge` (this operation takes about 20-30 seconds on the school iMacs) It will the compile like the normal mode, and compare the `diff/huge` file with the output of your gnl.
     
 
-**Feature to come:**
+# Feature to come:
 
 -   huge-buf-size mode, a mode that compiles with different and random `BUFFER_SIZE` between 1 and 4096.
 
