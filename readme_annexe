@@ -5,36 +5,30 @@
 # Usage
 
 Change your gnl directory in 𝘨𝘯𝘭-𝘵𝘳𝘶𝘴𝘵𝘧𝘪𝘯𝘥𝘦𝘳.𝘴𝘩 :
-src_path="*../yourpath*" --- default path is "*../gnl*"
+`src_path="*../yourpath*"` --- default path is "*../gnl*"
 
-`./gnl-trustfinder [-$f] [$option]`
-`./gnl-trustfinder [--$flag] [$option]`
+`./gnl-trustfinder [-$f]`
+`./gnl-trustfinder [--$flag]`
 
-	-h | --help display help message 
-	-t | --test test flag
-options: 
-	**n** | **normal** 	normal mode
-	 **l** | **leaks** 		only tests leaks 
-	**b** | **bonus** 		only tests bonus 
-	**a** | **all** 		all tests 
-	**hf** | **huge-file** 	test with huge file (48000 lines)
+flags:
+	**-h** | **--help** 		display help message 
+	**-n** | **--normal** 		normal mode
+	 **-l** | **--leaks** 		only tests leaks 
+	**-b** | **--bonus** 		only tests bonus 
+	**-a** | **--all** 		all tests 
+	**-hf** | **--huge-file** 	test with huge file (48000 lines)
 
-**Example**: running ./gnl-trustfinder -t b will test for bonus, without testing the rest.
+**Example**: running `./gnl-trustfinder -b` will test for bonus, without testing the rest.
 
-The flags are interchangeable, meaning that it does not matter if you type the short flag with a full option and vice-versa.
-
-## Create files and folders
-
-
-
-SmartyPants converts ASCII punctuation characters into "smart" typographic punctuation HTML entities. For example:
-
-|                |ASCII                          |HTML                         |
-|----------------|-------------------------------|-----------------------------|
-|Single backticks|`'Isn't this fun?'`            |'Isn't this fun?'            |
-|Quotes          |`"Isn't this fun?"`            |"Isn't this fun?"            |
-|Dashes          |`-- is en-dash, --- is em-dash`|-- is en-dash, --- is em-dash|
-
+|Short flag      |Full flag               |Description                        |
+|----------------|------------------------|-----------------------------------|
+|**-h**          |**--help**              |display help message               |
+|**-n**          |**--normal**            |normal mode                        |
+|**-l**          |**--leaks**             |only tests leaks                   |
+|**-b**          |**--bonus**             |only tests bonus                   |
+|**-hf**         |**--all**               |test with huge file (48000 lines)  |
+|**-a**          |**--huge-file**         |only tests leaks                   |
+|----------------|------------------------|-----------------------------------|
 
 Features:
 
