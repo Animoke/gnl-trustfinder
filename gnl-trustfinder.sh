@@ -18,6 +18,7 @@ function exit_err()
 function exit_success()
 {
 	echo -ne "\n${GREEN}Thank you for using gnl-trustfinder!\n${NOCOLOR}"
+	echo -ne "\n${GREEN}Thank you for using gnl-trustfinder!\n${NOCOLOR}" >> DEEPTHOUGHT
 	cleanup
 	exit 0
 }
@@ -229,7 +230,7 @@ function huge_files_init()
 	echo -e "${YELLOW}-------diff/huge file generation-------${NOCOLOR}"
 	echo -e "${YELLOW}-------diff/huge file generation-------${NOCOLOR}" >> DEEPTHOUGHT
 	echo -n > diff/huge
-	echo -ne "\nGenerating diff/huge... this may take a minute.\n" && echo -ne "\nGenerating diff/huge... this may take a minute." >> DEEPTHOUGHT
+	echo -ne "Generating diff/huge... this may take a minute.\n" && echo -ne "Generating diff/huge... this may take a minute.\n" >> DEEPTHOUGHT
 	counter=1
 	while [ $counter -le 48000 ]
 	do
@@ -552,17 +553,17 @@ function leaks_test()
 			echo "================================================================="
 			./obj/1_leaks_test.out diff/small 2>> DEEPTHOUGHT
 			echo "=================================================================" >> DEEPTHOUGHT
-			echo -e "$uni_fail [1] Your get_next_line leaks! $diff_ko"
+			echo -e "$uni_fail [1] Your get_next_line leaks! $diff_ko" && echo -e "$uni_fail [1] Your get_next_line leaks! $diff_ko" >> DEEPTHOUGHT
 		else
-			echo -e "$uni_success [1] Your get_next_line does not leak!   $diff_ok"
+			echo -e "$uni_success [1] Your get_next_line does not leak!   $diff_ok" && echo -e "$uni_success [1] Your get_next_line does not leak!   $diff_ok" >> DEEPTHOUGHT
 		fi
 		if ! ./obj/512_leaks_test.out diff/small > /dev/null ; then
 			echo "================================================================="
 			./obj/512_leaks_test.out diff/small 2>> DEEPTHOUGHT
 			echo "=================================================================" >> DEEPTHOUGHT
-			echo -e "$uni_fail [512] Your get_next_line leaks! $diff_ko"
+			echo -e "$uni_fail [512] Your get_next_line leaks! $diff_ko" && echo -e "$uni_fail [512] Your get_next_line leaks! $diff_ko" >> DEEPTHOUGHT
 		else
-			echo -e "$uni_success [512] Your get_next_line does not leak! $diff_ok"	
+			echo -e "$uni_success [512] Your get_next_line does not leak! $diff_ok"	&& echo -e "$uni_success [512] Your get_next_line does not leak! $diff_ok" >> DEEPTHOUGHT
 		fi
 	fi
 }
@@ -807,11 +808,14 @@ function normal_tests()
 function ask_huge_file()
 {
 	read -p 'Do you want to test with huge-file? [Y/n] '
-	if [ $REPLY == "Y" ] || [ $REPLY == "y" ] ; then
+	echo -ne "Do you want to test with huge-file? [Y/n] " >> DEEPTHOUGHT
+	if [ "$REPLY" == "Y" ] || [ "$REPLY" == "y" ] || [ ! "$REPLY" ] ; then
+		echo -ne "Y\n\n" >> DEEPTHOUGHT
 		echo
 		huge_files_init
 		huge_file
 	else
+		echo -n "n" >> DEEPTHOUGHT
 		exit_success
 	fi
 }
