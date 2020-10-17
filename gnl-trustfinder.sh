@@ -15,6 +15,13 @@ function exit_err()
 	exit 1
 }
 
+function exit_success()
+{
+	echo -ne "\n${GREEN}Thank you for using gnl-trustfinder!\n${NOCOLOR}"
+	cleanup
+	exit 0
+}
+
 src_path="../gnl" #Change directory here
 
 trap cleanup EXIT
@@ -256,7 +263,11 @@ int		main(int ac, char **av)
 	int fd = open(av[1], O_RDONLY);
 	int d;
 	while ((d = get_next_line(fd, &line)) > 0)
+	{
 		printf(\"%s\n\", line);
+		free(line);
+	}
+	free(line);
 	return (0);
 }" > mains/main.c
 
@@ -272,10 +283,17 @@ int		main(int ac, char **av)
 	while (d)
 	{
 		if (d &= (get_next_line(fd1, &line) > 0))
+		{
 			printf(\"%s\n\", line);
+			free(line);
+		}
 		if (d &= (get_next_line(fd2, &line) > 0))
+		{
 			printf(\"%s\n\", line);
+			free(line);
+		}
 	}
+	//free(line);
 	return (0);
 }	
 " > mains/main_bonus.c
@@ -318,6 +336,9 @@ echo -e "${YELLOW}
 ########### GNL-TRUSTFINDER ###########
 #######################################
 ============❯ by gpatingr ❮============
+
+
+https://github.com/animoke/gnl-trustfinder.git
 ${NOCOLOR}"
 echo -e "${YELLOW}
 =======================================
@@ -325,6 +346,9 @@ echo -e "${YELLOW}
 ########### GNL-TRUSTFINDER ###########
 #######################################
 ============❯ by gpatingr ❮============
+
+
+https://github.com/animoke/gnl-trustfinder.git
 ${NOCOLOR}" >> DEEPTHOUGHT
 }
 
@@ -690,6 +714,9 @@ function bonus_tests()
 	fi
 	echo "" && echo "" >> DEEPTHOUGHT
 	
+<<BONUSLEAKS
+
+    # leaks tests do not work
 	# Compiling with -fsanitize=address to test for leaks
 	leaks_tests=true
 	echo -e "${YELLOW}----------Testing bonus leaks----------${NOCOLOR}"
@@ -730,7 +757,7 @@ function bonus_tests()
 			echo -e "$uni_success [512] Your get_next_line_bonus does not leak! $diff_ok"	
 		fi
 	fi
-
+BONUSLEAKS
 
 }
 
@@ -774,7 +801,18 @@ function normal_tests()
 	normal_diff_tests
 	leaks_test
 	cleanup
-	exit 0
+	exit_success
+}
+
+function ask_huge_file()
+{
+	read -p 'Do you want to test with huge-file? [Y/n] '
+	if [ $REPLY == "Y" ] || [ $REPLY == "y" ] ; then
+		huge_files_init
+		huge_file
+	else
+		exit_success
+	fi
 }
 
 if [ $# == 0 ] ; then
@@ -784,62 +822,59 @@ fi
 
 function syntax_err()
 {
-	echo -ne "${RED}Usage:${NOCOLOR}${NOCOLOR} ./gnl-trustfinder [-\$f] [\$option]\n"
-	echo -ne "       ./gnl-trustfinder [--\$flag] [\$option]\n\n"
-	echo -e "  ${LIGHTCYAN}-h | --help    ${NOCOLOR}display this message"
-	echo -e "  ${LIGHTCYAN}-t | --test    ${NOCOLOR}test flag"
-	echo -ne "\noptions:
-        ${LIGHTCYAN}n | normal${NOCOLOR}     normal mode
-        ${LIGHTCYAN}l | leaks ${NOCOLOR}     only tests leaks
-        ${LIGHTCYAN}b | bonus ${NOCOLOR}     only tests bonus
-        ${LIGHTCYAN}a | all   ${NOCOLOR}     all tests
-       ${LIGHTCYAN}hf | huge-file ${NOCOLOR} test with huge file (48000 lines)\n\n"
-#	echo -e "options:
-#        ${LIGHTCYAN}---no options avalaible yet---${NOCOLOR}"
+	echo -ne "${RED}Usage:${NOCOLOR}${NOCOLOR} ./gnl-trustfinder [-\$f]\n"
+	echo -ne "       ./gnl-trustfinder [--\$flag]\n\n"
+	echo -ne "\nflags:
+        ${LIGHTCYAN}-h ⎪ --help${NOCOLOR}       display this message
+        ${LIGHTCYAN}-n ⎪ --normal${NOCOLOR}     normal mode
+        ${LIGHTCYAN}-l ⎪ --leaks ${NOCOLOR}     only tests leaks
+        ${LIGHTCYAN}-b ⎪ --bonus ${NOCOLOR}     only tests bonus
+        ${LIGHTCYAN}-a ⎪ --all   ${NOCOLOR}     all tests
+       ${LIGHTCYAN}-hf ⎪ --huge-file ${NOCOLOR} tests with huge file (48000 lines)\n\n"
 	echo -ne "\n${GREEN}Examples:${NOCOLOR}
-These commands will run the same tests
-${LIGHTCYAN}./gnl_trustfinder -t all${NOCOLOR}
-${LIGHTCYAN}./gnl_trustfinder -t a${NOCOLOR}
-${LIGHTCYAN}./gnl_trustfinder --test all${NOCOLOR}
-${LIGHTCYAN}./gnl_trustfinder --test a${NOCOLOR}\n"
-	exit_err
+${LIGHTCYAN}./gnl_trustfinder -h${NOCOLOR}
+${LIGHTCYAN}./gnl_trustfinder --help${NOCOLOR}\n"
 }
 case $1 in
-	-t | --test)
-		if [ "$2" == "normal" ] || [ "$2" == "n" ] ; then
-			startup_welcome
-			normal_tests
-		elif [ "$2" == "leaks" ] || [ "$2" == "l" ] ; then
-			startup_welcome
-			normal_files_init
-			src_cpy_no_bonus
-			no_bonus_compilation
-			leaks_test
-		elif [ "$2" == "bonus" ] || [ "$2" == "b" ] ; then
-			bonus_files_init
-			startup_welcome
-			bonus_tests
-		elif [ "$2" == "all" ] || [ "$2" == "a" ] ; then
-			startup_welcome
-			normal_files_init
-			bonus_files_init
-			src_cpy_no_bonus
-			no_bonus_compilation
-			normal_diff_tests
-			leaks_test
-			bonus_tests
-		elif [ "$2" == "huge-file" ] || [ "$2" == "hf" ] ; then
-			startup_welcome
-			huge_files_init
-			src_cpy_no_bonus
-			no_bonus_compilation
-			huge_file
-		else
-			syntax_err
-		fi
-	;;
-	-h | --help) syntax_err;;
-	*) syntax_err;;
+	-n | --normal)
+		startup_welcome
+		normal_tests
+		exit_success;;
+	-l | --leaks)
+		startup_welcome
+		normal_files_init
+		src_cpy_no_bonus
+		no_bonus_compilation
+		leaks_test
+		exit_success;;
+	-b | --bonus)
+		bonus_files_init
+		startup_welcome
+		bonus_tests
+		exit_success;;
+	-a | --all)
+		startup_welcome
+		normal_files_init
+		bonus_files_init
+		src_cpy_no_bonus
+		no_bonus_compilation
+		normal_diff_tests
+		leaks_test
+		bonus_tests
+		ask_huge_file
+		exit_success;;
+	-hf | --huge-file)
+		startup_welcome
+		huge_files_init
+		src_cpy_no_bonus
+		no_bonus_compilation
+		huge_file
+		exit_success;;
+	-h | --help)
+		syntax_err
+		exit 0;;
+	*) syntax_err
+		exit 1;;
 
 esac
 echo ""
