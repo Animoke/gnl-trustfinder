@@ -28,7 +28,6 @@ flags:
 |**-b**          |**--bonus**             |only tests bonus                   |
 |**-hf**         |**--all**               |test with huge file (48000 lines)  |
 |**-a**          |**--huge-file**         |only tests leaks                   |
-|----------------|------------------------|-----------------------------------|
 
 Features:
 
