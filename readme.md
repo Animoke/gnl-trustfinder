@@ -4,15 +4,13 @@
 
 # Usage
 
-Change your gnl directory in 𝘨𝘯𝘭-𝘵𝘳𝘶𝘴𝘵𝘧𝘪𝘯𝘥𝘦𝘳.𝘴𝘩 :
-`src_path="*../yourpath*"` --- default is `src_path"*../gnl*"`
+Change your gnl directory in 𝘨𝘯𝘭-𝘵𝘳𝘶𝘴𝘵𝘧𝘪𝘯𝘥𝘦𝘳.𝘴𝘩 :   
+`src_path="../*yourpath*"` --- default is `src_path"../gnl"`   
 
-
-`./gnl-trustfinder [-$f]`
-
-`./gnl-trustfinder [--$flag]`
-
-
+`./gnl-trustfinder [-$f]`   
+`./gnl-trustfinder [--$flag]`   
+   
+   
 |Short flag      |Full flag               |Description                        |
 |----------------|------------------------|-----------------------------------|
 |**-h**          |**--help**              |display help message               |
@@ -21,8 +19,8 @@ Change your gnl directory in 𝘨𝘯𝘭-𝘵𝘳𝘶𝘴𝘵𝘧𝘪𝘯𝘥�
 |**-b**          |**--bonus**             |only tests bonus                   |
 |**-hf**         |**--all**               |test with huge file (48000 lines)  |
 |**-a**          |**--huge-file**         |only tests leaks                   |
-
-**Example**: running `./gnl-trustfinder -b` will test for bonus, without testing the rest.
+   
+**Example**: running `./gnl-trustfinder -b` will test for bonus, without testing the rest.   
 
 **Features:**
 
