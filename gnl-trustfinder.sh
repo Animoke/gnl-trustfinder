@@ -226,10 +226,10 @@ Let it all blow in the sky" > diff/bonus_big2
 
 function huge_files_init()
 {
-	echo -e "${YELLOW}---------Generating  diff/huge---------${NOCOLOR}"
-	echo -e "${YELLOW}---------Generating  diff/huge---------${NOCOLOR}" >> DEEPTHOUGHT
+	echo -e "${YELLOW}-------diff/huge file generation-------${NOCOLOR}"
+	echo -e "${YELLOW}-------diff/huge file generation-------${NOCOLOR}" >> DEEPTHOUGHT
 	echo -n > diff/huge
-	echo -ne "\nGenerating diff/huge... this may take a minute." && echo "\nGenerating diff/huge... this may take a minute." >> DEEPTHOUGHT
+	echo -ne "\nGenerating diff/huge... this may take a minute.\n" && echo -ne "\nGenerating diff/huge... this may take a minute." >> DEEPTHOUGHT
 	counter=1
 	while [ $counter -le 48000 ]
 	do
@@ -237,7 +237,7 @@ function huge_files_init()
 		((counter++))
 	done
 	if wc -l diff/huge | grep 48000 > /dev/null ; then
-		echo -ne "\n$uni_success diff/huge successfully generated.\n"
+		echo -ne "$uni_success diff/huge successfully generated.\n\n" && echo -ne "\n$uni_success diff/huge successfully generated.\n\n" >> DEEPTHOUGHT
 	else
 		echo -ne "\n$uni_fail diff/huge did not generate correctly. Would you like to retry? "
 		read -p '[Y/n] ' retry
@@ -808,6 +808,7 @@ function ask_huge_file()
 {
 	read -p 'Do you want to test with huge-file? [Y/n] '
 	if [ $REPLY == "Y" ] || [ $REPLY == "y" ] ; then
+		echo
 		huge_files_init
 		huge_file
 	else
@@ -818,6 +819,7 @@ function ask_huge_file()
 if [ $# == 0 ] ; then
 	startup_welcome
 	normal_tests
+	exit_success
 fi
 
 function syntax_err()
