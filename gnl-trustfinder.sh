@@ -326,6 +326,7 @@ uni_success="${GREEN}✓${NOCOLOR}"
 uni_fail="${RED}✗${NOCOLOR}"
 uni_arrow="➥"
 uni_sep="❯"
+uni_rev_sep="❮"
 diff_ok="${GREEN}[OK]${NOCOLOR}"
 diff_ko="${RED}[KO]${NOCOLOR}"
 
@@ -762,6 +763,92 @@ BONUSLEAKS
 
 }
 
+function size_compilation()
+{
+i=1
+	echo -e "${YELLOW}---------Compiling size option---------${NOCOLOR}"
+	echo -e "${YELLOW}---------Compiling size option---------${NOCOLOR}" >> DEEPTHOUGHT
+	while [ $i -le 128 ]
+	do
+		gcc -Wall -Werror -Wextra -D BUFFER_SIZE=$i src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/$i.size.out
+		if ls obj/$i.size.out 2>> /dev/null >> /dev/null ; then
+			echo -e "$uni_arrow  obj/$i.size.out $uni_sep${GREEN} Compilation successful $uni_success${NOCOLOR}"
+			echo -e "$uni_arrow  obj/$i.size.out $uni_sep${GREEN} Compilation successful $uni_success${NOCOLOR}" >> DEEPTHOUGHT
+		else
+			echo -e "$uni_arrow  obj/$i.size.out $uni_sep${RED} Compilation failed $uni_fail${NOCOLOR}"
+			echo -e "$uni_arrow  obj/$i.size.out $uni_sep${RED} Compilation failed $uni_fail${NOCOLOR}" >> DEEPTHOUGHT
+		fi
+		((i=i+3))
+	done
+	while [ $i -le 4096 ]
+	do
+		gcc -Wall -Werror -Wextra -D BUFFER_SIZE=$i src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/$i.size.out
+		if ls obj/$i.size.out 2>> /dev/null >> /dev/null ; then
+			echo -e "$uni_arrow  obj/$i.size.out $uni_sep${GREEN} Compilation successful $uni_success${NOCOLOR}"
+			echo -e "$uni_arrow  obj/$i.size.out $uni_sep${GREEN} Compilation successful $uni_success${NOCOLOR}" >> DEEPTHOUGHT
+		else
+			echo -e "$uni_arrow  obj/$i.size.out $uni_sep${RED} Compilation failed $uni_fail${NOCOLOR}"
+			echo -e "$uni_arrow  obj/$i.size.out $uni_sep${RED} Compilation failed $uni_fail${NOCOLOR}" >> DEEPTHOUGHT
+		fi
+		((i = (i + ($RANDOM % 10) + 128) * 1,23))
+	done
+	echo
+}
+
+function size_test()
+{
+i=1
+	echo -ne "\n     ${YELLOW}$uni_sep$uni_sep$uni_sep Testing with diff/$1 $uni_rev_sep$uni_rev_sep$uni_rev_sep\n\n"
+	echo -ne "\n     ${YELLOW}$uni_sep$uni_sep$uni_sep Testing with diff/$1 $uni_rev_sep$uni_rev_sep$uni_rev_sep\n\n" >> DEEPTHOUGHT
+	while [ $i -le 4096 ]
+	do
+		if ! ls obj/$i.size.out 2>> /dev/null >> /dev/null; then
+			((i++))
+		else 
+			size_diff "$1" "$i"
+			((i++))
+		fi
+	done
+}
+
+function size_diff()
+{
+		./obj/$2.size.out diff/$1 > diff.txt	
+		if diff diff/$1 diff.txt >> DEEPTHOUGHT ; then
+			echo -e "$diff_ok BUFFER_SIZE=$2"
+			echo -e "$diff_ok BUFFER_SIZE=$2" >> DEEPTHOUGHT
+		fi
+		if ! diff diff/$1 diff.txt ; then
+			echo -e "$diff_ko BUFFER_SIZE=$2: error: files do not match. View DEEPTHOUGHT for more details."
+			echo -e "$diff_ko BUFFER_SIZE=$2" >> DEEPTHOUGHT
+		fi
+		((i++))
+}
+
+function size()
+{
+	echo -ne "${RED}$uni_sep This WILL take some time. Are you sure you want to run it? [Y/n] ${NOCOLOR}"
+	echo -ne "${RED}$uni_sep This WILL take some time. Are you sure you want to run it? [Y/n] ${NOCOLOR}" >> DEEPTHOUGHT
+	read
+	if [ "$REPLY" == "Y" ] || [ "$REPLY" == "y" ] || [ ! "$REPLY" ] ; then
+		echo
+		echo "Y" >> DEEPTHOUGHT
+		size_compilation
+		echo -e "${YELLOW}----------Testing size option----------${NOCOLOR}"
+		echo -e "${YELLOW}----------Testing size option----------${NOCOLOR}" >> DEEPTHOUGHT
+		size_test "empty"
+		size_test "rly_small"
+		size_test "small"
+		size_test "med"
+		size_test "big"
+	else
+		echo "n" >> DEEPTHOUGHT
+		echo "Exiting..."
+		exit 0
+	fi
+	exit_success
+}
+
 function huge_file()
 {
 	counter=1
@@ -801,7 +888,6 @@ function normal_tests()
 	no_bonus_compilation
 	normal_diff_tests
 	leaks_test
-	cleanup
 	exit_success
 }
 
@@ -835,12 +921,14 @@ function syntax_err()
         ${LIGHTCYAN}-n ⎪ --normal${NOCOLOR}     normal mode
         ${LIGHTCYAN}-l ⎪ --leaks ${NOCOLOR}     only tests leaks
         ${LIGHTCYAN}-b ⎪ --bonus ${NOCOLOR}     only tests bonus
-        ${LIGHTCYAN}-a ⎪ --all   ${NOCOLOR}     all tests
-       ${LIGHTCYAN}-hf ⎪ --huge-file ${NOCOLOR} tests with huge file (48000 lines)\n\n"
+       ${LIGHTCYAN}-hf ⎪ --huge-file ${NOCOLOR} tests with huge file (48000 lines)
+        ${LIGHTCYAN}-s ⎪ --size ${NOCOLOR}      random BUFFER_SIZE between 1 and 4096
+        ${LIGHTCYAN}-a ⎪ --all   ${NOCOLOR}     all tests\n\n"
 	echo -ne "\n${GREEN}Examples:${NOCOLOR}
 ${LIGHTCYAN}./gnl_trustfinder -h${NOCOLOR}
 ${LIGHTCYAN}./gnl_trustfinder --help${NOCOLOR}\n"
 }
+
 case $1 in
 	-n | --normal)
 		startup_welcome
@@ -857,6 +945,12 @@ case $1 in
 		bonus_files_init
 		startup_welcome
 		bonus_tests
+		exit_success;;
+	-s | --size)
+		startup_welcome
+		normal_files_init
+		src_cpy_no_bonus
+		size
 		exit_success;;
 	-a | --all)
 		startup_welcome
