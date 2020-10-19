@@ -1,5 +1,5 @@
 #!/bin/bash
-#VERSION: beta-0.6b
+VERSION=" beta-0.6b  "
 #AUTHOR: gpatingr (gpatingr@student.42.fr)
 
 function cleanup()
@@ -340,9 +340,9 @@ echo -e "${YELLOW}
 ########### GNL-TRUSTFINDER ###########
 #######################################
 ============❯ by gpatingr ❮============
+============$uni_sep ${RED}$VERSION${YELLOW}$uni_rev_sep============
 
-
-https://github.com/animoke/gnl-trustfinder.git
+github.com/animoke/gnl-trustfinder.git
 ${NOCOLOR}"
 echo -e "${YELLOW}
 =======================================
@@ -350,9 +350,10 @@ echo -e "${YELLOW}
 ########### GNL-TRUSTFINDER ###########
 #######################################
 ============❯ by gpatingr ❮============
+============$uni_sep ${RED}$VERSION${YELLOW}$uni_rev_sep============
 
 
-https://github.com/animoke/gnl-trustfinder.git
+github.com/animoke/gnl-trustfinder.git
 ${NOCOLOR}" >> DEEPTHOUGHT
 }
 
@@ -846,7 +847,7 @@ function size()
 		if ls diff/huge >> /dev/null 2>> /dev/null ; then
 			size_test "huge"
 		else
-			echo -e "diff/huge not found. Skipping..."
+			echo -ne "\ndiff/huge not found. Skipping...\n"
 		fi
 	else
 		echo "n" >> DEEPTHOUGHT
@@ -902,7 +903,7 @@ function ask_huge_file()
 {
 	echo -ne "$uni_sep"
 	read -p 'Do you want to test with huge-file? [Y/n] '
-	echo -ne "$uni_sep Do you want to test with huge-file? [Y/n] " >> DEEPTHOUGHT
+	echo -ne "$uni_sep  Do you want to test with huge-file? [Y/n] " >> DEEPTHOUGHT
 	if [ "$REPLY" == "Y" ] || [ "$REPLY" == "y" ] || [ ! "$REPLY" ] ; then
 		echo -ne "Y\n\n" >> DEEPTHOUGHT
 		echo
@@ -955,12 +956,22 @@ case $1 in
 		bonus_tests
 		exit_success;;
 	-s | --size)
-		startup_welcome
-		normal_files_init
-		src_cpy_no_bonus
-		no_bonus_compilation
-		size
-		exit_success;;
+#		echo $#
+#		echo "$2, $3, $4"
+#		if [ [ $# >= "3" ] && [ $# <= "4" ] ] ; then
+ #			if [ [ "$2" == "range" ] || [ "$2" == "r" ] ] && [ "$3" >= "1" ] && [ "$4" > "$3" ]; then
+#				echo "$2, $3"
+#			fi
+		if [ "$#" == "1" ] ; then
+			startup_welcome
+			normal_files_init
+			src_cpy_no_bonus
+			no_bonus_compilation
+			size
+			exit_success
+		else
+			syntax_err
+		fi;;
 	-a | --all)
 		startup_welcome
 		normal_files_init
