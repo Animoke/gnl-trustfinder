@@ -5,7 +5,7 @@
 # Usage
 
 Change your gnl directory in 𝘨𝘯𝘭-𝘵𝘳𝘶𝘴𝘵𝘧𝘪𝘯𝘥𝘦𝘳.𝘴𝘩 :   
-`src_path="../*yourpath*"` --- default is `src_path"../gnl"`   
+`src_path="../𝘺𝘰𝘶𝘳𝘱𝘢𝘵𝘩"` --- default is `src_path"../gnl"`   
 
 `./gnl-trustfinder [-$f]`   
 `./gnl-trustfinder [--$flag]`   
@@ -17,16 +17,17 @@ Change your gnl directory in 𝘨𝘯𝘭-𝘵𝘳𝘶𝘴𝘵𝘧𝘪𝘯𝘥�
 |**-n**          |**--normal**            |normal mode                        |
 |**-l**          |**--leaks**             |only tests leaks                   |
 |**-b**          |**--bonus**             |only tests bonus                   |
-|**-hf**         |**--all**               |test with huge file (48000 lines)  |
-|**-a**          |**--huge-file**         |only tests leaks                   |
+|**-hf**         |**--huge-file**         |test with huge file (48000 lines)  |
+|**-s**          |**--size**              |test BUFFER_SIZE from 1 to 4096    |
+|**-a**          |**--all**               |only tests leaks                   |
    
 **Example**: running `./gnl-trustfinder -b` will test for bonus, without testing the rest.   
    
 # Features:
 
--   Normal mode: The normal mode will compile your files with a `BUFFER_SIZE` of 1 to 8. It will then compare the output of the binary and compare it with the input file (in the `diff/` directory when the programm is running). The leaks test uses `*-fsanitize=address*` on compilation to look for more informations if there are leaks.
+-   Normal mode: The normal mode will compile your files with a `BUFFER_SIZE` of 1 to 8. It will then compare the output of the binary and compare it with the input file (in the `diff/` directory when the programm is running). The leaks test uses `-fsanitize=address` on compilation to look for more informations if there are leaks.
     
--   Leaks mode: This mode will do the same as the normal mode, but skipping the comparison. The leaks test uses `*-fsanitize=address*` on compilation to look for more informations if there are leaks.
+-   Leaks mode: This mode will do the same as the normal mode, but skipping the comparison. The leaks test uses `-fsanitize=address` on compilation to look for more informations if there are leaks.
     
 -   Bonus mode: This mode will compile with `BUFFER_SIZE` 1 and 512, and then compare the output of the binaries to the input file.
     
