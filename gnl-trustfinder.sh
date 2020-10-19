@@ -1,4 +1,6 @@
 #!/bin/bash
+#VERSION: beta-0.6b
+#AUTHOR: gpatingr (gpatingr@student.42.fr)
 
 function cleanup()
 {
@@ -827,20 +829,25 @@ function size_diff()
 
 function size()
 {
-	echo -ne "${RED}$uni_sep This WILL take some time. Are you sure you want to run it? [Y/n] ${NOCOLOR}"
-	echo -ne "${RED}$uni_sep This WILL take some time. Are you sure you want to run it? [Y/n] ${NOCOLOR}" >> DEEPTHOUGHT
+	echo -ne "\n${RED}$uni_sep This WILL take some time. Are you sure you want to run it? [Y/n] ${NOCOLOR}"
+	echo -ne "\n${RED}$uni_sep This WILL take some time. Are you sure you want to run it? [Y/n] ${NOCOLOR}" >> DEEPTHOUGHT
 	read
 	if [ "$REPLY" == "Y" ] || [ "$REPLY" == "y" ] || [ ! "$REPLY" ] ; then
 		echo
 		echo "Y" >> DEEPTHOUGHT
 		size_compilation
-		echo -e "${YELLOW}----------Testing size option----------${NOCOLOR}"
-		echo -e "${YELLOW}----------Testing size option----------${NOCOLOR}" >> DEEPTHOUGHT
+		echo -e "\n${YELLOW}----------Testing size option----------${NOCOLOR}"
+		echo -e "\n${YELLOW}----------Testing size option----------${NOCOLOR}" >> DEEPTHOUGHT
 		size_test "empty"
 		size_test "rly_small"
 		size_test "small"
 		size_test "med"
 		size_test "big"
+		if ls diff/huge >> /dev/null 2>> /dev/null ; then
+			size_test "huge"
+		else
+			echo -e "diff/huge not found. Skipping..."
+		fi
 	else
 		echo "n" >> DEEPTHOUGHT
 		echo "Exiting..."
@@ -893,8 +900,9 @@ function normal_tests()
 
 function ask_huge_file()
 {
+	echo -ne "$uni_sep"
 	read -p 'Do you want to test with huge-file? [Y/n] '
-	echo -ne "Do you want to test with huge-file? [Y/n] " >> DEEPTHOUGHT
+	echo -ne "$uni_sep Do you want to test with huge-file? [Y/n] " >> DEEPTHOUGHT
 	if [ "$REPLY" == "Y" ] || [ "$REPLY" == "y" ] || [ ! "$REPLY" ] ; then
 		echo -ne "Y\n\n" >> DEEPTHOUGHT
 		echo
@@ -902,7 +910,7 @@ function ask_huge_file()
 		huge_file
 	else
 		echo -n "n" >> DEEPTHOUGHT
-		exit_success
+#		exit_success
 	fi
 }
 
@@ -950,6 +958,7 @@ case $1 in
 		startup_welcome
 		normal_files_init
 		src_cpy_no_bonus
+		no_bonus_compilation
 		size
 		exit_success;;
 	-a | --all)
@@ -962,6 +971,7 @@ case $1 in
 		leaks_test
 		bonus_tests
 		ask_huge_file
+		size
 		exit_success;;
 	-hf | --huge-file)
 		startup_welcome
