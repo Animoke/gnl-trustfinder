@@ -1,10 +1,12 @@
 #!/bin/bash
-VERSION=" beta-0.6b  "
 #AUTHOR: gpatingr (gpatingr@student.42.fr)
+VERSION=" beta-0.6b  "
+
+src_path="../gnl-vog-cpy" #Change directory here
 
 function cleanup()
 {
- 	rm -f diff.txt diff2.txt
+#	rm -f diff.txt diff2.txt
 	rm -rf obj
 	rm -rf src
 	rm -rf diff
@@ -25,7 +27,6 @@ function exit_success()
 	exit 0
 }
 
-src_path="../gnl" #Change directory here
 
 trap cleanup EXIT
 mkdir obj src diff mains
@@ -394,7 +395,7 @@ function no_bonus_compilation()
 		gcc -Wall -Werror -Wextra -D BUFFER_SIZE=$buffer_size src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/$buffer_size.out
 		echo -e "gcc -Wall -Werror -Wextra -D BUFFER_SIZE=$buffer_size src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/$buffer_size.out" >> DEEPTHOUGHT
 		if ! ls obj/$buffer_size.out ; then
-			echo -e "${NOCOLOR} $uni_fail $buffer_size ${uni_sep}${RED} error: compilation failed. View DEEPTOUGHT for more info $diff_ko${NOCOLOR}"
+			echo -e "${NOCOLOR} $uni_fail $buffer_size ${uni_sep}${RED} error: compilation failed. View DEEPTHOUGHT for more info $diff_ko${NOCOLOR}"
 			echo -e "$uni_fail${RED}Compilation failed. $diff_ko${NOCOLOR}" >> DEEPTHOUGHT
 			gcc -Wall -Werror -Wextra -D BUFFER_SIZE=$buffer_size src/get_next_line.c src/get_next_line_utils.c mains/main.c -o obj/$buffer_size.out 2>> DEEPTHOUGHT
 			exit_err
@@ -413,27 +414,32 @@ function normal_diff_tests()
 {
 	# Comparing output and input file with diff/*
 	diff_output=1
+	segfault=0
 	echo -e "${YELLOW}-----------Comparing outputs-----------${NOCOLOR}"
 	echo -e "${YELLOW}-----------Comparing outputs-----------${NOCOLOR}" >> DEEPTHOUGHT
 	echo ""
-	echo -e "$uni_arrow Comparing with diff/empty" && echo -e "$uni_arrow Comparing with diff/empty" >> DEEPTHOUGHT
-	while [ $counter -le 8 ]
-	do
-		./obj/$counter.out diff/empty > diff.txt
-		if ! diff -q diff/empty diff.txt > /dev/null ; then
-			diff diff/empty diff.txt >> DEEPTHOUGHT
-			echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
-			echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko" >> DEEPTHOUGHT
-			echo -e "$uni_fail error: output differs from diff/empty"
-			((diff_output=1))
-		else
-			echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
-			echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok" >> DEEPTHOUGHT
-			((diff_output=0))
-		fi
-		echo -ne "$NOCOLOR"
-		((counter++))
-	done
+	echo -e "$uni_arrow Testing with no input" && echo -e "$uni_arrow Testing with no input" >> DEEPTHOUGHT
+	./obj/$counter.out diff/empty 2> diff.txt
+	./obj/$counter.out diff/empty > diff.txt
+	if  grep -i "segmentation" diff.txt > /dev/null ; then
+		echo -ne "$uni_fail No input $diff_ko "
+		echo -ne "$uni_fail No input $diff_ko " >> DEEPTHOUGHT
+		echo -e "${RED}Segmentation fault${NOCOLOR}"
+		echo -e "${RED}Segmentation fault${NOCOLOR}" >> DEEPTHOUGHT
+		segfault=1
+		((diff_output=1))
+	elif ! diff -q diff/empty diff.txt > /dev/null ; then
+		diff diff/empty diff.txt >> DEEPTHOUGHT
+		echo -e "$uni_fail No input $diff_ko"
+		echo -e "$uni_fail No input $diff_ko" >> DEEPTHOUGHT
+		echo -e "$uni_fail error: output differs from diff/empty"
+		((diff_output=1))
+	else
+		echo -e "$uni_success No input $diff_ok"
+		echo -e "$uni_success No input $diff_ok" >> DEEPTHOUGHT
+		((diff_output=0))
+	fi
+	echo -ne "$NOCOLOR"
 	counter=1
 	empty_diff=$diff_output
 	echo "" && echo "" >> DEEPTHOUGHT
@@ -442,10 +448,17 @@ function normal_diff_tests()
 	do
 		./obj/$counter.out diff/rly_small > diff.txt
 		if ! diff -q diff/rly_small diff.txt > /dev/null ; then
-			diff diff/rly_small diff.txt >> DEEPTHOUGHT
-			echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
-			echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko" >> DEEPTHOUGHT
-			echo -e "$uni_fail error: output differs from diff/rly_small"
+			./obj/$counter.out diff/rly_small 2> diff.txt
+			echo -ne "$uni_fail BUFFER_SIZE=$counter $diff_ko "
+			echo -ne "$uni_fail BUFFER_SIZE=$counter $diff_ko " >> DEEPTHOUGHT
+			if ! cat diff.txt | grep -i "segmentation" ; then
+				echo -e "${RED}Segmentation fault${NOCOLOR}"
+				echo -e "${RED}Segmentation fault${NOCOLOR}" >> DEEPTHOUGHT
+				segfault=1
+			else
+				diff diff/small diff.txt >> DEEPTHOUGHT
+				echo -e "$uni_fail error: output differs from diff/small"
+			fi
 			((diff_output=1))
 		else
 			echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
@@ -463,10 +476,17 @@ function normal_diff_tests()
 	do
 		./obj/$counter.out diff/small > diff.txt
 		if ! diff -q diff/small diff.txt > /dev/null ; then
-			diff diff/small diff.txt >> DEEPTHOUGHT
-			echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
-			echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko" >> DEEPTHOUGHT
-			echo -e "$uni_fail error: output differs from diff/small"
+			./obj/$counter.out diff/small 2> diff.txt
+			echo -ne "$uni_fail BUFFER_SIZE=$counter $diff_ko "
+			echo -ne "$uni_fail BUFFER_SIZE=$counter $diff_ko " >> DEEPTHOUGHT
+			if ! cat diff.txt | grep -i "segmentation" ; then
+				echo -e "${RED}Segmentation fault${NOCOLOR}"
+				echo -e "${RED}Segmentation fault${NOCOLOR}" >> DEEPTHOUGHT
+				segfault=1
+			else
+				diff diff/small diff.txt >> DEEPTHOUGHT
+				echo -e "$uni_fail error: output differs from diff/small"
+			fi
 			((diff_output=1))
 		else
 			echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
@@ -484,11 +504,18 @@ function normal_diff_tests()
 	do
 		./obj/$counter.out diff/med > diff.txt
 		if ! diff -q diff/med diff.txt > /dev/null ; then
-			diff diff/med diff.txt >> DEEPTHOUGHT
-			echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
-			echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko" >> DEEPTHOUGHT
-			echo -e "$uni_fail error: output differs from diff/med"
-			((diff_output=1))
+			./obj/$counter.out diff/med 2> diff.txt
+			echo -ne "$uni_fail BUFFER_SIZE=$counter $diff_ko "
+			echo -ne "$uni_fail BUFFER_SIZE=$counter $diff_ko " >> DEEPTHOUGHT
+			if ! cat diff.txt | grep -i "segmentation" ; then
+				echo -e "${RED}Segmentation fault${NOCOLOR}"
+				echo -e "${RED}Segmentation fault${NOCOLOR}" >> DEEPTHOUGHT
+				segfault=1
+			else
+				diff diff/med diff.txt >> DEEPTHOUGHT
+				echo -e "$uni_fail error: output differs from diff/med"
+			fi
+		((diff_output=1))
 		else
 			echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
 			echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok" >> DEEPTHOUGHT
@@ -505,10 +532,17 @@ function normal_diff_tests()
 	do
 		./obj/$counter.out diff/big > diff.txt
 		if ! diff -q diff/big diff.txt > /dev/null ; then
-			diff diff/big diff.txt >> DEEPTHOUGHT
-			echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko"
-			echo -e "$uni_fail BUFFER_SIZE=$counter $diff_ko" >> DEEPTHOUGHT
-			echo -e "$uni_fail error: output differs from diff/big"
+			./obj/$counter.out diff/big 2> diff.txt
+			echo -ne "$uni_fail BUFFER_SIZE=$counter $diff_ko "
+			echo -ne "$uni_fail BUFFER_SIZE=$counter $diff_ko " >> DEEPTHOUGHT
+			if ! cat diff.txt | grep -i "segmentation" ; then
+				echo -e "${RED}Segmentation fault${NOCOLOR}"
+				echo -e "${RED}Segmentation fault${NOCOLOR}" >> DEEPTHOUGHT
+				segfault=1
+			else
+				diff diff/big diff.txt >> DEEPTHOUGHT
+				echo -e "$uni_fail error: output differs from diff/big"
+			fi
 			((diff_output=1))
 		else
 			echo -e "$uni_success BUFFER_SIZE=$counter $diff_ok"
